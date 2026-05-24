@@ -82,6 +82,22 @@
       margin-bottom: 14px;
     }
 
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .panel-head h2 {
+      margin-bottom: 0;
+    }
+
+    .panel-head .pill {
+      flex: 0 0 auto;
+    }
+
     .form-grid {
       display: grid;
       gap: 12px;
@@ -127,7 +143,7 @@
       background: #f8fafb;
     }
 
-    .tabs button, .seg button, .primary {
+    .tabs button, .seg button, .primary, .secondary {
       height: 36px;
       border: 0;
       border-radius: 6px;
@@ -149,6 +165,13 @@
       background: var(--brand);
       color: #fff;
       margin-top: 4px;
+    }
+
+    .secondary {
+      width: 100%;
+      background: #e8f3f8;
+      color: #0f5f78;
+      margin-top: 0;
     }
 
     .summary {
@@ -261,6 +284,69 @@
       margin-top: 18px;
     }
 
+    .advanced-manual {
+      display: none;
+    }
+
+    .result-block {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--line);
+    }
+
+    .result-block:first-of-type {
+      margin-top: 0;
+      padding-top: 0;
+      border-top: 0;
+    }
+
+    .result-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .result-title strong {
+      color: var(--ink);
+      font-size: 14px;
+    }
+
+    .calc-process {
+      display: grid;
+      gap: 8px;
+      padding: 12px;
+      border: 1px solid #c7d7e2;
+      border-radius: 8px;
+      background: #f7fbfd;
+      font-size: 13px;
+    }
+
+    .calc-step {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 10px;
+      align-items: start;
+    }
+
+    .calc-step b {
+      display: inline-flex;
+      width: 24px;
+      height: 24px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      background: #dceef6;
+      color: #0f5f78;
+      font-size: 12px;
+    }
+
+    .calc-step span {
+      color: #254252;
+      overflow-wrap: anywhere;
+    }
+
     .monitor-layout {
       display: grid;
       grid-template-columns: minmax(300px, 380px) 1fr;
@@ -314,6 +400,33 @@
       margin-top: 4px;
     }
 
+    .um-config {
+      display: grid;
+      gap: 12px;
+      padding: 12px;
+      border: 1px solid #bfd8d3;
+      border-radius: 8px;
+      background: #f6fbf9;
+    }
+
+    .um-config[hidden],
+    .um-result[hidden],
+    [hidden] {
+      display: none !important;
+    }
+
+    .um-accessories {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+    }
+
+    .um-result {
+      margin-bottom: 16px;
+    }
+
     .price-input {
       min-width: 96px;
       height: 32px;
@@ -337,14 +450,68 @@
       font-size: 12px;
     }
 
+    .action-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-top: 14px;
+    }
+
+    .compact-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .auth-panel {
+      display: grid;
+      grid-template-columns: minmax(260px, 1fr) auto;
+      gap: 14px;
+      align-items: end;
+      margin-bottom: 18px;
+      border-color: #c7d7e2;
+      background: #f7fbfd;
+    }
+
+    .auth-copy {
+      display: grid;
+      gap: 6px;
+    }
+
+    .auth-copy strong {
+      color: var(--ink);
+      font-size: 15px;
+    }
+
+    .auth-copy span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .auth-controls {
+      display: grid;
+      grid-template-columns: minmax(190px, 1fr) auto auto;
+      gap: 8px;
+      align-items: end;
+      min-width: 430px;
+    }
+
+    .auth-state {
+      font-size: 12px;
+      color: var(--muted);
+      grid-column: 1 / -1;
+    }
+
     @media (max-width: 980px) {
       .grid, .manual, .monitor-layout { grid-template-columns: 1fr; }
       .summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .auth-panel, .auth-controls { grid-template-columns: 1fr; min-width: 0; }
     }
 
     @media (max-width: 560px) {
       header, main { padding-left: 12px; padding-right: 12px; }
-      .summary, .two { grid-template-columns: 1fr; }
+      .summary, .two, .um-accessories { grid-template-columns: 1fr; }
       .tabs, .seg { overflow-x: auto; }
       th, td { min-width: 120px; }
     }
@@ -354,11 +521,27 @@
   <header>
     <div class="wrap">
       <h1>艾特网能 UPS 蓄电池配置计算</h1>
-      <p>按 Google Drive 资料中的“UPS 蓄电池配置表”和销售配置指导书整理，覆盖太行 UR、昆仑 UE，以及 SP-b、GBT 铅酸蓄电池推荐配置。</p>
+      <p>按 Google Drive 资料中的“UPS 蓄电池配置表”和销售配置指导书整理，覆盖太行 UR、昆仑 UE、祁连 UM，以及 SP-b、SPG-b、GFMD-B、GBT 铅酸蓄电池推荐配置。</p>
     </div>
   </header>
 
   <main>
+    <section class="panel auth-panel">
+      <div class="auth-copy">
+        <strong>权限验证</strong>
+        <span>未授权访问时，页面和导出的报价会隐藏目录价、折后价和合计金额。如需使用完整功能，请联系开发者 Michael jie。</span>
+      </div>
+      <div class="auth-controls">
+        <label>
+          授权手机号
+          <input id="authPhone" type="tel" inputmode="tel" placeholder="请输入已授权手机号">
+        </label>
+        <button class="secondary" id="authVerify" type="button">验证</button>
+        <button class="secondary" id="authLogout" type="button">退出</button>
+        <span class="auth-state" id="authState">未验证：目录价将显示为 ****</span>
+      </div>
+    </section>
+
     <div class="grid">
       <section class="panel">
         <h2>配置选择</h2>
@@ -368,10 +551,84 @@
             <select id="series"></select>
           </label>
 
-          <label>
+          <label id="upsField">
             UPS 型号
             <select id="ups"></select>
           </label>
+
+          <div id="umConfig" class="um-config" hidden>
+            <div class="seg" aria-label="UM 配置模式">
+              <button type="button" id="umModeModular" class="active" data-um-mode="modular">模块/机柜</button>
+              <button type="button" id="umModeIntegrated" data-um-mode="integrated">一体化 UPS</button>
+            </div>
+
+            <div id="umModularFields" class="form-grid">
+              <div class="two">
+                <label>
+                  功率模块
+                  <select id="umModule"></select>
+                </label>
+                <label>
+                  机柜
+                  <select id="umCabinet"></select>
+                </label>
+              </div>
+              <div class="two">
+                <label>
+                  模块数量
+                  <input id="umModuleQty" type="number" min="1" step="1" value="1">
+                </label>
+                <label>
+                  配置容量
+                  <input id="umCapacity" type="text" value="-" readonly>
+                </label>
+              </div>
+            </div>
+
+            <div id="umIntegratedFields" class="form-grid" hidden>
+              <label>
+                一体化机框
+                <select id="umIntegrated"></select>
+              </label>
+              <div class="two">
+                <label>
+                  功率模块
+                  <select id="umIntegratedModule"></select>
+                </label>
+                <label>
+                  模块数量
+                  <input id="umIntegratedQty" type="number" min="1" step="1" value="1">
+                </label>
+              </div>
+            </div>
+
+            <div class="um-accessories">
+              <label class="check-row">
+                <input id="umSnmp" type="checkbox">
+                SNMP 卡
+              </label>
+              <label>
+                SNMP 数量
+                <input id="umSnmpQty" type="number" min="0" step="1" value="1">
+              </label>
+              <label>
+                LBS 线缆
+                <select id="umLbs"></select>
+              </label>
+              <label>
+                LBS 数量
+                <input id="umLbsQty" type="number" min="0" step="1" value="0">
+              </label>
+              <label>
+                并机线缆
+                <select id="umParallel"></select>
+              </label>
+              <label>
+                并机线数量
+                <input id="umParallelQty" type="number" min="0" step="1" value="0">
+              </label>
+            </div>
+          </div>
 
           <div class="two">
             <label>
@@ -379,6 +636,7 @@
               <select id="batterySeries">
                 <option value="sp">SP-b 系列</option>
                 <option value="gbt">GBT 系列</option>
+                <option value="gfmd">GFMD 2V 系列</option>
               </select>
             </label>
             <label>
@@ -403,14 +661,41 @@
             </label>
           </div>
 
+          <label class="check-row">
+            <input id="includeMonitor" type="checkbox">
+            需要电池监控仪
+          </label>
+
+          <div class="two">
+            <label>
+              UPS 套数
+              <input id="systemQty" type="number" min="1" step="1" value="1">
+            </label>
+            <label>
+              并机台数/套
+              <input id="parallelUnits" type="number" min="1" step="1" value="1">
+            </label>
+          </div>
+
           <button class="primary" id="apply">计算</button>
+          <div class="compact-actions">
+            <button class="secondary" id="addProjectItem" type="button">加入项目清单</button>
+            <button class="secondary" id="exportQuote" type="button">导出 Excel 报价</button>
+          </div>
         </div>
-        <p class="source">资料来源：Drive 文件夹 “03】-UPS&供配电 / 销售配置指导 / 电池销售配置指导书”。</p>
+        <p class="source">资料来源：Drive 文件夹 “03】-UPS&供配电 / 销售配置指导 / 电池销售配置指导书”；UM 电池配置来自 “UPS蓄电池配置表（20181026）”，电池重量、容量和端子按 “07】-铅酸电池” SP-b / SPG-b / GFMD-B / GBT 彩页校准；价格按本地“价格”目录中的 UPS、电池、监控仪价格表带入。</p>
       </section>
 
       <section class="panel">
-        <h2>计算结果</h2>
-        <div class="summary">
+        <div class="panel-head">
+          <h2>配置输出</h2>
+          <span class="pill" id="outputMode">UPS + 蓄电池</span>
+        </div>
+        <div class="result-block">
+          <div class="result-title">
+            <strong>配置摘要</strong>
+          </div>
+          <div class="summary">
           <div class="metric">
             <span>推荐电池</span>
             <strong id="recBattery">-</strong>
@@ -431,9 +716,82 @@
             <strong id="powerNeed">-</strong>
             <small id="loadPower">-</small>
           </div>
+          <div class="metric">
+            <span>UPS 参考价</span>
+            <strong id="upsPrice">-</strong>
+            <small id="upsPriceNote">-</small>
+          </div>
+          <div class="metric">
+            <span>电池小计</span>
+            <strong id="batteryPrice">-</strong>
+            <small id="batteryPriceNote">-</small>
+          </div>
+          </div>
         </div>
-        <div id="notes"></div>
-        <div class="table-wrap">
+
+        <div class="result-block">
+          <div class="result-title">
+            <strong>计算过程</strong>
+          </div>
+          <div class="calc-process" id="calcProcess"></div>
+        </div>
+
+        <div class="result-block">
+          <div class="result-title">
+            <strong>配置建议</strong>
+          </div>
+          <div id="notes"></div>
+          <div class="guide" id="salesAdvice">
+            <strong>销售配置建议</strong>
+            <ol id="salesAdviceList"></ol>
+          </div>
+        </div>
+
+        <div id="umResult" class="um-result" hidden>
+          <div class="summary">
+            <div class="metric">
+              <span>UM 容量</span>
+              <strong id="umResultCapacity">-</strong>
+              <small id="umResultMode">-</small>
+            </div>
+            <div class="metric">
+              <span>机柜/机框</span>
+              <strong id="umResultCabinet">-</strong>
+              <small id="umResultCabinetPrice">-</small>
+            </div>
+            <div class="metric">
+              <span>功率模块</span>
+              <strong id="umResultModule">-</strong>
+              <small id="umResultModulePrice">-</small>
+            </div>
+            <div class="metric">
+              <span>UPS 合计</span>
+              <strong id="umResultTotal">-</strong>
+              <small id="umResultAccessoryTotal">-</small>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>编码</th>
+                  <th>型号</th>
+                  <th>名称</th>
+                  <th>数量</th>
+                  <th>目录单价</th>
+                  <th>目录小计</th>
+                  <th>说明</th>
+                </tr>
+              </thead>
+              <tbody id="umPriceBody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="result-block">
+          <div class="result-title">
+            <strong>后备时间与报价明细</strong>
+          </div>
+          <div class="table-wrap">
           <table>
             <thead>
               <tr>
@@ -443,15 +801,18 @@
                 <th>最大电流/开关</th>
                 <th>节数</th>
                 <th>直流电压</th>
+                <th>电池单价</th>
+                <th>电池小计</th>
               </tr>
             </thead>
             <tbody id="optionsBody"></tbody>
           </table>
+          </div>
         </div>
       </section>
     </div>
 
-    <section class="manual">
+    <section class="manual advanced-manual" aria-hidden="true">
       <div class="panel">
         <h2>手动核算</h2>
         <div class="form-grid">
@@ -502,13 +863,16 @@
             <small>按 1.75V/cell 截止</small>
           </div>
         </div>
-        <div class="formula">W = PL / (N * 6 * η)<br>I = PL / (N * 1.75 * 6 * η)</div>
-        <p class="source">PL = UPS 容量 × 功率因数 × 负载率。12V 电池按 6 个 2V 单格计算。</p>
+        <div class="formula">W = PL / (N * 单格数 * η * 组数)<br>I = PL / (N * 1.75 * 单格数 * η * 组数)</div>
+        <p class="source">PL = UPS 容量 × 功率因数 × 负载率。12V 电池按 6 个 2V 单格计算，2V 单体按 1 个单格计算。</p>
       </div>
     </section>
 
-    <section class="panel subsection">
-      <h2>电池监控仪配置</h2>
+    <section class="panel subsection" id="monitorSection" hidden>
+      <div class="panel-head">
+        <h2>电池监控仪配置</h2>
+        <span class="pill">已纳入报价</span>
+      </div>
       <div class="guide">
         <strong>配置说明</strong>
         <ol>
@@ -627,8 +991,67 @@
         </div>
       </div>
     </section>
+
+    <section class="panel subsection">
+      <div class="panel-head">
+        <h2>项目清单</h2>
+        <span class="pill" id="projectSummary">当前配置导出</span>
+      </div>
+      <p class="source">不同型号或多套 UPS 可逐项加入项目清单；清单为空时，导出使用当前配置。</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>项目项</th>
+              <th>配置</th>
+              <th>拓扑</th>
+              <th>后备时间</th>
+              <th>监控仪</th>
+              <th>目录小计</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="projectBody"></tbody>
+        </table>
+      </div>
+      <div class="action-row">
+        <button class="secondary" id="clearProjectItems" type="button">清空项目清单</button>
+      </div>
+    </section>
+
+    <section class="panel subsection">
+      <h2>报价折扣与导出</h2>
+      <p class="source">每个产品可单独填写折扣百分比；留空按 100% 目录价/参考价导出。</p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>类别</th>
+              <th>编码</th>
+              <th>型号</th>
+              <th>名称</th>
+              <th>数量</th>
+              <th>目录单价</th>
+              <th>折扣 %</th>
+              <th>折后单价</th>
+              <th>折后小计</th>
+            </tr>
+          </thead>
+          <tbody id="quoteDiscountBody"></tbody>
+        </table>
+      </div>
+      <div class="action-row">
+        <strong id="quoteDiscountTotal">折后合计 -</strong>
+        <button class="secondary" id="exportQuoteBottom" type="button">导出 Excel 报价</button>
+      </div>
+    </section>
   </main>
 
+  <script src="authorized-phones.js"></script>
+  <script src="price-data.js"></script>
+  <script src="battery-products-data.js"></script>
+  <script src="um-battery-data.js"></script>
+  <script src="gbt-battery-data.js"></script>
   <script>
     const durations = ["15", "30", "60", "120"];
     const hallSensors = [
@@ -666,6 +1089,19 @@
 
     let currentMonitorBatteryModel = "";
     let currentMonitorTerminalNote = "";
+    let currentMonitorQuoteLines = [];
+    let currentQuote = { lines: [], notes: [] };
+    let currentSalesAdvice = [];
+    let currentCalculationSteps = [];
+    let projectItems = [];
+    let isPriceAuthorized = false;
+    const AUTH_STORAGE_KEY = "ups-price-auth-hash";
+    const quoteDiscounts = {};
+    const UPS_PRICES = buildUpsPrices(window.UPS_PRICE_ROWS || []);
+    const BATTERY_PRICES = buildBatteryPrices(window.BATTERY_PRICE_ROWS || []);
+    const BATTERY_PRODUCTS = buildBatteryProducts(window.BATTERY_PRODUCT_ROWS || []);
+    const UM_BATTERY_DATA = buildUmBatteryData(window.UM_BATTERY_ROWS || []);
+    const GBT_POWER_DATA = buildGbtPowerData(window.GBT_BATTERY_POWER_ROWS || []);
 
     const DATA = {
       taixing: {
@@ -789,19 +1225,206 @@
             gbt: picks(["GBT12-200","2组*36节","1*630A+2*630A"],["GBT12-250","2组*40节","1*500A+2*500A"],["GBT12-250","3组*42节","1*500A+3*250A"],["SPG12890b","4组*50节","1*400A+4*160A"])
           })
         ]
+      },
+      qilian: {
+        name: "祁连 UM 系列",
+        type: "um",
+        batteryRange: "32-44 / 30-50",
+        modules: [
+          umModule("m25", 25, "祁连 UM-0250TFL-M", "01020386", "25kVA 功率模块，新版", 65000),
+          umModule("m25li", 25, "祁连 UM-0250TFL-M-Li", "01021077", "25kVA 功率模块，锂电池版", 68250, true),
+          umModule("m30", 30, "祁连 UM-0300TFL-M", "01020387", "30kVA 功率模块，新版", 66730),
+          umModule("m30li", 30, "祁连 UM-0300TFL-M-Li", "01021079", "30kVA 功率模块，锂电池版", 76810, true),
+          umModule("m50", 50, "祁连 UM-0500TFL-M", "01021107", "50kVA 功率模块，新版", 82690),
+          umModule("m50li", 50, "祁连 UM-0500TFL-M-Li", "01021081", "50kVA 功率模块，锂电池版", 86820, true),
+          umModule("m100", 100, "祁连 UM-1000TFL-M", "01021115", "100kVA 功率模块", 149500)
+        ],
+        cabinets: [
+          umCabinet("c25-125ff", 25, 5, "祁连 UM-1250TFL-FF", "01021054", "125kVA 机柜，四开关，新版", 93750, "四开关"),
+          umCabinet("c25-125ff-li", 25, 5, "祁连 UM-1250TFL-FF-Li", "01021078", "125kVA 机柜，四开关，锂电池版", 107840, "四开关", true),
+          umCabinet("c30-180fs", 30, 6, "祁连 UM-1800TFL-FS/3", "01021039", "180kVA 机柜，只含维修旁路开关，新版", 123600, "维修旁路"),
+          umCabinet("c30-300ff", 30, 10, "祁连 UM-3000TFL-FF/3", "01021157", "300kVA 机框，四开关，下进线", 185400, "四开关，下进线"),
+          umCabinet("c30-180fs-li", 30, 6, "祁连 UM-1800TFL-FS/3-Li", "01021080", "180kVA 机柜，只含维修旁路开关，锂电池版", 143790, "维修旁路", true),
+          umCabinet("c50-200fs", 50, 4, "祁连 UM-2000TAL-FS/5-1", "01020389", "200kVA 标配机柜，维修旁路，下进线", 140000, "维修旁路，下进线"),
+          umCabinet("c50-200fs-t", 50, 4, "祁连 UM-2000TAL-FS/5-1-T", "01021105", "200kVA 标配机柜，维修旁路，上进线", 146670, "维修旁路，上进线"),
+          umCabinet("c50-200ff", 50, 4, "祁连 UM-2000TAL-FF/5-1", "01021114", "200kVA 机柜，四开关，下走线", 163330, "四开关，下走线"),
+          umCabinet("c50-300fs", 50, 6, "祁连 UM-3000TAL-FS/5-1", "01020390", "300kVA 标配机柜，维修旁路，下进线", 169170, "维修旁路，下进线"),
+          umCabinet("c50-300fs-t", 50, 6, "祁连 UM-3000TAL-FS/5-1-T", "01021106", "300kVA 标配机柜，维修旁路，上进线", 175680, "维修旁路，上进线"),
+          umCabinet("c50-300ff", 50, 6, "祁连 UM-3000TAL-FF/5-1", "01021108", "300kVA 机柜，四开关，下走线", 195200, "四开关，下走线"),
+          umCabinet("c50-400ff-h", 50, 8, "祁连 UM-4000TAL-FF/5-1", "01020391", "400kVA 满配机柜，四开关，高效型", 265940, "四开关，高效型"),
+          umCabinet("c50-500ff-h", 50, 10, "祁连 UM-5000TAL-FF/5-1", "01020392", "500kVA 满配机柜，四开关，高效型", 297220, "四开关，高效型"),
+          umCabinet("c50-600ff-h", 50, 12, "祁连 UM-6000TAL-FF/5-1", "01020393", "600kVA 满配机柜，四开关，高效型", 373330, "四开关，高效型"),
+          umCabinet("c50-800ff", 50, 16, "祁连 UM-8000TAL-FF/5-1", "01021063", "800kVA 满配机柜，四开关", 621020, "四开关"),
+          umCabinet("c50-400ff-s", 50, 8, "祁连 UM-4000TAL-FF/5-1", "01020401", "400kVA 满配机柜，四开关，标准型", 233590, "四开关，标准型"),
+          umCabinet("c50-500ff-s", 50, 10, "祁连 UM-5000TAL-FF/5-1", "01020402", "500kVA 满配机柜，四开关，标准型", 265150, "四开关，标准型"),
+          umCabinet("c50-600ff-s", 50, 12, "祁连 UM-6000TAL-FF/5-1", "01020403", "600kVA 满配机柜，四开关，标准型", 327980, "四开关，标准型"),
+          umCabinet("c50-200fs-li", 50, 4, "祁连 UM-2000TAL-FS/5-1-Li", "01021082", "200kVA 机柜，维修旁路，锂电池版", 163330, "维修旁路", true),
+          umCabinet("c50-300fs-li", 50, 6, "祁连 UM-3000TAL-FS/5-1-Li", "01021083", "300kVA 机柜，维修旁路，锂电池版", 202220, "维修旁路", true),
+          umCabinet("c50-400ff-li", 50, 8, "祁连 UM-4000TAL-FF/5-1-Li", "01021084", "400kVA 机柜，四开关，锂电池版", 350370, "四开关", true),
+          umCabinet("c50-500ff-li", 50, 10, "祁连 UM-5000TAL-FF/5-1-Li", "01021085", "500kVA 机柜，四开关，锂电池版", 391110, "四开关", true),
+          umCabinet("c50-600ff-li", 50, 12, "祁连 UM-6000TAL-FF/5-1-Li", "01021086", "600kVA 机柜，四开关，锂电池版", 456300, "四开关", true),
+          umCabinet("c50-800ff-li", 50, 16, "祁连 UM-8000TAL-FF/5-1-Li", "01021087", "800kVA 机柜，四开关，锂电池版", 717040, "四开关", true),
+          umCabinet("c100-600fs", 100, 6, "祁连 UM-6000TFL-FS/100", "01021116", "600kVA 机柜，100kVA 模块用，维修旁路，上进线", 327000, "维修旁路，上进线"),
+          umCabinet("c100-600ff", 100, 6, "祁连 UM-6000TFL-FF/100", "01021117", "600kVA 满配机柜，100kVA 模块用，四开关，上进线", 353330, "四开关，上进线")
+        ],
+        integrated: [
+          umIntegrated("i125-d-1100", "祁连 UM-1250TFL-D", "01021044", "125kVA 一体化 UPS，双路输入 ATS，1100mm，新版", 329320),
+          umIntegrated("i125-s-1100", "祁连 UM-1250TFL-S", "01021045", "125kVA 一体化 UPS，单路输入 MCCB，1100mm，新版", 277720),
+          umIntegrated("i125-d-1200", "祁连 UM-1250TFL-D", "01021127", "125kVA 一体化 UPS，双路输入 ATS，1200mm 深", 334910),
+          umIntegrated("i125-s-1200", "祁连 UM-1250TFL-S", "01021128", "125kVA 一体化 UPS，单路输入 MCCB，1200mm 深", 283320),
+          umIntegrated("i125-dg-1200", "祁连 UM-1250TFL-D-G", "01021130", "125kVA 一体化 UPS，双路输入 ATS，1200mm 深，国产开关", 263260),
+          umIntegrated("i125-sg-1200", "祁连 UM-1250TFL-S-G", "01021129", "125kVA 一体化 UPS，单路输入 MCCB，1200mm 深，国产开关", 211890),
+          umIntegrated("i125-sg-1100", "祁连 UM-1250TFL-S-G", "01021072", "125kVA 一体化 UPS，单路输入 MCCB，1100mm，国产开关", 206290),
+          umIntegrated("i125-d-li-1200", "祁连 UM-1250TFL-D-Li", "01021133", "125kVA 一体化 UPS，双路输入 ATS，1200mm，锂电版", 419120, true),
+          umIntegrated("i125-s-li-1200", "祁连 UM-1250TFL-S-Li", "01021134", "125kVA 一体化 UPS，单路输入 MCCB，1200mm，锂电版", 354210, true),
+          umIntegrated("i125-sg-li-1200", "祁连 UM-1250TFL-S-G-Li", "01021135", "125kVA 一体化 UPS，单路输入 MCCB，1200mm，国产开关锂电版", 264910, true),
+          umIntegrated("i125-dg-li-1200", "祁连 UM-1250TFL-D-G-Li", "01021136", "125kVA 一体化 UPS，双路输入 ATS，1200mm，国产开关锂电版", 329440, true),
+          umIntegrated("i125-d-li-1100", "祁连 UM-1250TFL-D-Li", "01021088", "125kVA 一体化 UPS，双路输入 ATS，1100mm，新版锂电池版", 412110, true),
+          umIntegrated("i125-s-li-1100", "祁连 UM-1250TFL-S-Li", "01021089", "125kVA 一体化 UPS，单路输入 MCCB，1100mm，新版锂电池版", 347230, true)
+        ],
+        accessories: {
+          snmp: { code: "01020400", model: "UE/UM SNMP 卡", name: "SNMP 卡", price: 5040, desc: "UE/UM SNMP 卡" },
+          lbs: [
+            { code: "01020397", model: "UE/UM 5mLBS 线", name: "5m LBS 线缆", price: 340 },
+            { code: "01020398", model: "UE/UM 10mLBS 线", name: "10m LBS 线缆", price: 490 },
+            { code: "01020399", model: "UE/UM 15mLBS 线", name: "15m LBS 线缆", price: 670 }
+          ],
+          parallel: [
+            { code: "01020394", model: "UE/UM 5m 并机线", name: "5m 并机线缆", price: 480 },
+            { code: "01020395", model: "UE/UM 10m 并机线", name: "10m 并机线缆", price: 820 },
+            { code: "01020396", model: "UE/UM 15m 并机线", name: "15m 并机线缆", price: 1240 },
+            { code: "01021042", model: "UE/UM 20m 并机线", name: "20m 并机线缆，F 版", price: 1640 }
+          ]
+        }
       }
     };
 
+    function normalizeUpsModel(model) {
+      return String(model || "").trim().toUpperCase().replace(/\s+/g, "");
+    }
+
+    function buildUpsPrices(rows) {
+      return rows.reduce((acc, [model, code, price, source]) => {
+        const key = normalizeUpsModel(model);
+        if (key) acc[key] = { model, code, price: Number(price || 0), source };
+        return acc;
+      }, {});
+    }
+
+    function buildBatteryPrices(rows) {
+      return rows.reduce((acc, [model, code, price, source]) => {
+        const key = normalizeBatteryModel(model);
+        if (key) acc[key] = { model, code, price: Number(price || 0), source };
+        return acc;
+      }, {});
+    }
+
+    function getUpsPrice(model) {
+      return UPS_PRICES[normalizeUpsModel(model)];
+    }
+
+    function getBatteryPrice(model) {
+      return BATTERY_PRICES[normalizeBatteryModel(model)];
+    }
+
     function row(model, desc, pf, battery, height, recommendations, note = "") {
-      return { model, desc, pf, battery, height, recommendations, note, kva: modelKva(model) };
+      const priceInfo = getUpsPrice(model);
+      return {
+        model,
+        desc,
+        pf,
+        battery,
+        height,
+        recommendations,
+        note,
+        kva: modelKva(model),
+        code: priceInfo?.code || "",
+        price: priceInfo?.price || 0,
+        priceSource: priceInfo?.source || ""
+      };
+    }
+
+    function umModule(id, kva, model, code, desc, price, lithium = false) {
+      return { id, kva, model, code, desc, price, lithium };
+    }
+
+    function umCabinet(id, moduleKva, maxModules, model, code, desc, price, switchConfig, lithium = false) {
+      return { id, moduleKva, maxModules, capacity: moduleKva * maxModules, model, code, desc, price, switchConfig, lithium };
+    }
+
+    function umIntegrated(id, model, code, desc, price, lithium = false) {
+      return { id, model, code, desc, price, lithium, moduleKvas: [25, 30], capacity: 125 };
     }
 
     function picks(a, b, c, d) {
-      return { 15: pick(a), 30: pick(b), 60: pick(c), 120: pick(d) };
+      return { 15: a ? pick(a) : undefined, 30: b ? pick(b) : undefined, 60: c ? pick(c) : undefined, 120: d ? pick(d) : undefined };
     }
 
     function pick(parts) {
       return { battery: parts[0], qty: parts[1], current: parts[2] };
+    }
+
+    function normalizeBatteryModel(model) {
+      let normalized = String(model || "").trim().toUpperCase();
+      if (!normalized) return "";
+      normalized = normalized.replace(/\s+/g, "");
+      if (/^SP12-\d+$/.test(normalized)) normalized += "B";
+      if (/^SP12-245B?$/.test(normalized)) return "SP12-250B";
+      if (/^SPG12\d+$/.test(normalized)) normalized += "B";
+      normalized = normalized.replace(/^(GFMD-\d+)C$/, "$1B");
+      return normalized;
+    }
+
+    function buildBatteryProducts(rows) {
+      return rows.reduce((acc, row) => {
+        const [model, series, blockV, capacityAh, weightKg, terminal, aliases = []] = row;
+        const product = { model, series, blockV, capacityAh, weightKg, terminal };
+        [model, ...aliases].forEach(alias => {
+          const key = normalizeBatteryModel(alias);
+          if (key) acc[key] = product;
+        });
+        return acc;
+      }, {});
+    }
+
+    function getBatteryProduct(model) {
+      return BATTERY_PRODUCTS[normalizeBatteryModel(model)];
+    }
+
+    function buildUmBatteryData(rows) {
+      return rows.reduce((acc, row) => {
+        const [profile, series, capacity, duration, battery, cells, strings, currentA, blockV, capacityAh, weightKg] = row;
+        const product = getBatteryProduct(battery);
+        const priceInfo = getBatteryPrice(product?.model || battery);
+        acc[profile] ??= {};
+        acc[profile][series] ??= {};
+        acc[profile][series][capacity] ??= {};
+        acc[profile][series][capacity][duration] = {
+          battery: product?.model || battery,
+          cells,
+          strings,
+          currentA,
+          blockV: product?.blockV || blockV,
+          capacityAh: product?.capacityAh || capacityAh,
+          weightKg: product?.weightKg || weightKg,
+          terminal: product?.terminal || "",
+          code: priceInfo?.code || "",
+          price: priceInfo?.price || 0,
+          priceSource: priceInfo?.source || "",
+          qty: `${strings}组*${cells}${blockV === 2 ? "只" : "节"}`,
+          current: `${formatNumber(currentA, 1)}A`
+        };
+        return acc;
+      }, {});
+    }
+
+    function buildGbtPowerData(rows) {
+      return rows.map(([model, capacityAh, weightKg, power]) => ({
+        model,
+        capacityAh,
+        weightKg,
+        power
+      })).sort((a, b) => a.capacityAh - b.capacityAh);
     }
 
     function modelKva(model) {
@@ -813,7 +1436,7 @@
     function getSelectedRow() {
       const seriesKey = document.querySelector("#series").value;
       const model = document.querySelector("#ups").value;
-      return DATA[seriesKey].rows.find(item => item.model === model);
+      return DATA[seriesKey].rows?.find(item => item.model === model);
     }
 
     function formatNumber(value, digits = 1) {
@@ -821,9 +1444,127 @@
       return new Intl.NumberFormat("zh-CN", { maximumFractionDigits: digits }).format(value);
     }
 
+    function canViewPrices() {
+      return isPriceAuthorized;
+    }
+
+    function maskPrice(value = "****") {
+      return canViewPrices() ? value : "****";
+    }
+
     function formatMoney(value) {
+      if (!canViewPrices()) return "****";
       if (!Number.isFinite(value) || value <= 0) return "-";
       return `¥${new Intl.NumberFormat("zh-CN", { maximumFractionDigits: 2 }).format(value)}`;
+    }
+
+    function quoteLine(code, model, name, qty, price, desc, source = "") {
+      const amount = Number(price || 0) * Number(qty || 0);
+      return { code: code || "", model, name, qty, price: Number(price || 0), amount, desc, source };
+    }
+
+    function cloneQuoteLine(line, qty = line.qty) {
+      return quoteLine(line.code, line.model, line.name, qty, line.price, line.desc, line.source);
+    }
+
+    function scaleQuoteLine(line, multiplier) {
+      if (!line) return undefined;
+      return cloneQuoteLine(line, Number(line.qty || 0) * multiplier);
+    }
+
+    function getBatteryQty(rec) {
+      if (!rec) return 0;
+      if (rec.cells && rec.strings) return rec.cells * rec.strings;
+      const qty = parseQty(rec.qty);
+      return qty.cells * qty.strings;
+    }
+
+    function getBatteryPriceLine(rec, multiplier = 1) {
+      if (!rec) return undefined;
+      const product = getBatteryProduct(rec.battery);
+      const model = product?.model || rec.battery;
+      const priceInfo = getBatteryPrice(model);
+      const price = Number(rec.price || priceInfo?.price || 0);
+      const qty = getBatteryQty(rec) * Math.max(1, multiplier);
+      return quoteLine(
+        rec.code || priceInfo?.code || "",
+        model,
+        "蓄电池",
+        qty,
+        price,
+        `${rec.qty}${multiplier > 1 ? ` × ${multiplier}台 UPS` : ""}；${product?.blockV || rec.blockV || 12}V / ${product?.capacityAh || rec.capacityAh || "-"}Ah`,
+        rec.priceSource || priceInfo?.source || ""
+      );
+    }
+
+    function setPriceSummary(upsLine, batteryLine, extraLines = []) {
+      const upsTotal = [upsLine, ...extraLines].filter(Boolean).reduce((sum, line) => sum + line.amount, 0);
+      document.querySelector("#upsPrice").textContent = formatMoney(upsTotal);
+      document.querySelector("#upsPriceNote").textContent = upsLine?.price
+        ? `${upsLine.code || "无编码"} / ${upsLine.source || "价格表"}`
+        : "价格表未匹配";
+
+      document.querySelector("#batteryPrice").textContent = formatMoney(batteryLine?.amount || 0);
+      document.querySelector("#batteryPriceNote").textContent = batteryLine?.price
+        ? `${batteryLine.qty} 支 × ${formatMoney(batteryLine.price)}`
+        : "价格表未匹配";
+    }
+
+    function renderSalesAdvice(items) {
+      currentSalesAdvice = items.filter(Boolean);
+      const box = document.querySelector("#salesAdvice");
+      const list = document.querySelector("#salesAdviceList");
+      box.hidden = currentSalesAdvice.length === 0;
+      list.innerHTML = currentSalesAdvice.map(item => `<li>${escapeExcel(item)}</li>`).join("");
+    }
+
+    function batterySwitchAdvice(rec) {
+      if (!rec) return "";
+      const cells = rec.cells || parseQty(rec.qty).cells;
+      const strings = rec.strings || parseQty(rec.qty).strings;
+      const voltage = switchVoltage(rec.blockV === 2 ? Math.ceil(cells / 6) : cells);
+      const current = rec.current || `${formatNumber(rec.currentA || 0, 1)}A`;
+      const branch = strings >= 2 ? "；多组并联时，分组开关/汇流盒容量不低于分组最大电流，销售指导书公式为 I分=I总/(组数-1)" : "";
+      return `电池开关按单组节数选择电压等级：≤20节选 250VDC，20~36节选 500VDC，38节及以上选 750VDC；当前建议 ${voltage}，最大电流/开关参考 ${current}${branch}。`;
+    }
+
+    function standardAdviceForRow(row, rec) {
+      const model = row.model;
+      const advice = [];
+      const isRack = model.includes("UR");
+      const isTower = model.includes("UE");
+      const isTpl = model.includes("TPL");
+      const isNpl = model.includes("NPL");
+      const isSmall = /-(00[123]0|0060|0100)SP[SL]$/.test(model) || isNpl;
+
+      if (rec) {
+        advice.push(`按销售配置表当前后备时间推荐 ${rec.battery}，${rec.qty}；如项目指定其他后备时间，以表内对应列为准。`);
+        advice.push(batterySwitchAdvice(rec));
+      } else if (String(row.battery).includes("内置")) {
+        advice.push(`该型号为标机，销售指导书按内置电池配置：${row.battery}；长延时项目优先切换对应长机型号。`);
+      }
+
+      if (row.note) advice.push(row.note);
+      if (isSmall) {
+        advice.push("通讯卡按指导书三选一：SNMP 卡 / Modbus 卡 / 干接点卡，标准 RS232、USB 接口不额外报价。");
+      }
+      if (isTpl) {
+        advice.push("TPL 机型最多支持 4 台并机；采用并机架构时，并机线按设备台数配置成环，线长按现场布局选择 3m / 5m / 10m。");
+        advice.push("TPL 机型通讯卡按指导书二选一：SNMP 卡或干接点卡；10~40kVA TPL 自带 Modbus，另可选电池温度补偿线和塔架互转支架。");
+      }
+      if (isTower && /UE-(0[68]00|1000|1200|1600|1800|2000)TPL/.test(model)) {
+        advice.push("60kVA 及以上昆仑 UE TPL 可按指导书选 LBS 线缆，常用长度 5m / 10m / 15m。");
+      }
+      if (isRack && /UR-(0300|0400)TPL/.test(model)) {
+        advice.push("UR 30/40kVA 销售指导书建议配套 POD 配电插框使用，POD 含主路输入、旁路输入、输出及维修旁路开关。");
+      }
+      if (isRack && /UR-(0060|0100)SPL/.test(model)) {
+        advice.push("UR 6/10kVA SPL 可配 16~20 节电池，默认 16 节；SPL 自带 1m 电池连接线。");
+      }
+      if (isRack && /UR-(0020|0030)SPL/.test(model)) {
+        advice.push("UR 2/3kVA SPL 可按指导书选机架式电池包，电池包最多 6 组并联，电池包自带 0.5m 并联线。");
+      }
+      return advice;
     }
 
     function priceKey(line) {
@@ -843,24 +1584,147 @@
       return "750VDC";
     }
 
+    function isUmSelected() {
+      return document.querySelector("#series").value === "qilian";
+    }
+
+    function normalizeAuthPhone(phone) {
+      let digits = String(phone || "").replace(/\D/g, "");
+      if (digits.length === 13 && digits.startsWith("86")) digits = digits.slice(2);
+      return digits;
+    }
+
+    async function sha256Hex(text) {
+      const bytes = new TextEncoder().encode(text);
+      const hash = await crypto.subtle.digest("SHA-256", bytes);
+      return Array.from(new Uint8Array(hash)).map(byte => byte.toString(16).padStart(2, "0")).join("");
+    }
+
+    function authHashes() {
+      return Array.isArray(window.AUTHORIZED_PHONE_HASHES) ? window.AUTHORIZED_PHONE_HASHES : [];
+    }
+
+    function setAuthState(authorized, message = "") {
+      isPriceAuthorized = authorized;
+      document.querySelector("#authState").textContent = message || (authorized
+        ? "已授权：目录价、折扣和合计金额可见。"
+        : "未验证：目录价将显示为 ****。如需使用完整功能，请联系开发者 Michael jie。");
+      document.querySelector("#authPhone").value = authorized ? "已授权" : "";
+      document.querySelector("#authPhone").disabled = authorized;
+      document.querySelector("#authVerify").disabled = authorized;
+    }
+
+    function initAuth() {
+      const savedHash = localStorage.getItem(AUTH_STORAGE_KEY);
+      if (savedHash && authHashes().includes(savedHash)) {
+        setAuthState(true);
+      } else {
+        localStorage.removeItem(AUTH_STORAGE_KEY);
+        setAuthState(false);
+      }
+      document.querySelector("#authVerify").addEventListener("click", verifyAuthPhone);
+      document.querySelector("#authPhone").addEventListener("keydown", event => {
+        if (event.key === "Enter") verifyAuthPhone();
+      });
+      document.querySelector("#authLogout").addEventListener("click", () => {
+        localStorage.removeItem(AUTH_STORAGE_KEY);
+        setAuthState(false);
+        populateUps();
+      });
+    }
+
+    async function verifyAuthPhone() {
+      const phone = normalizeAuthPhone(document.querySelector("#authPhone").value);
+      if (!phone) {
+        setAuthState(false, "请输入授权手机号。如需使用完整功能，请联系开发者 Michael jie。");
+        return;
+      }
+      const hash = await sha256Hex(phone);
+      if (authHashes().includes(hash)) {
+        localStorage.setItem(AUTH_STORAGE_KEY, hash);
+        setAuthState(true);
+        populateUps();
+      } else {
+        localStorage.removeItem(AUTH_STORAGE_KEY);
+        setAuthState(false, "手机号未授权：目录价将显示为 ****。如需使用完整功能，请联系开发者 Michael jie。");
+      }
+    }
+
+    function monitorIncluded() {
+      return document.querySelector("#includeMonitor")?.checked || false;
+    }
+
+    function systemQty() {
+      return Math.max(1, Math.floor(Number(document.querySelector("#systemQty")?.value || 1)));
+    }
+
+    function parallelUnits() {
+      return Math.max(1, Math.floor(Number(document.querySelector("#parallelUnits")?.value || 1)));
+    }
+
+    function totalUpsUnits() {
+      return systemQty() * parallelUnits();
+    }
+
+    function topologyText() {
+      const systems = systemQty();
+      const parallel = parallelUnits();
+      return parallel > 1 ? `${systems} 套系统，每套 ${parallel} 台并机，共 ${systems * parallel} 台 UPS` : `${systems} 套独立 UPS`;
+    }
+
+    function syncOutputVisibility() {
+      const include = monitorIncluded();
+      document.querySelector("#monitorSection").hidden = !include;
+      document.querySelector("#outputMode").textContent = include ? "UPS + 蓄电池 + 监控仪" : "UPS + 蓄电池";
+    }
+
+    function renderCalculationProcess(steps) {
+      currentCalculationSteps = steps.filter(Boolean);
+      document.querySelector("#calcProcess").innerHTML = currentCalculationSteps.map((step, index) => `
+        <div class="calc-step">
+          <b>${index + 1}</b>
+          <span>${escapeExcel(step)}</span>
+        </div>
+      `).join("");
+    }
+
     function init() {
+      initAuth();
       const series = document.querySelector("#series");
       series.innerHTML = Object.entries(DATA).map(([key, value]) => `<option value="${key}">${value.name}</option>`).join("");
       series.addEventListener("change", populateUps);
       document.querySelector("#ups").addEventListener("change", calculate);
       document.querySelector("#batterySeries").addEventListener("change", calculate);
       document.querySelector("#duration").addEventListener("change", calculate);
+      document.querySelector("#includeMonitor").addEventListener("change", calculate);
+      document.querySelector("#systemQty").addEventListener("input", calculate);
+      document.querySelector("#parallelUnits").addEventListener("input", calculate);
       document.querySelector("#apply").addEventListener("click", calculate);
+      document.querySelector("#addProjectItem").addEventListener("click", addProjectItem);
+      document.querySelector("#clearProjectItems").addEventListener("click", clearProjectItems);
+      document.querySelector("#projectBody").addEventListener("click", handleProjectClick);
+      document.querySelector("#exportQuote").addEventListener("click", exportQuote);
+      document.querySelector("#exportQuoteBottom").addEventListener("click", exportQuote);
+      document.querySelector("#quoteDiscountBody").addEventListener("change", handleDiscountInput);
       document.querySelector("#manualCalc").addEventListener("click", manualCalc);
       document.querySelector("#monitorCalc").addEventListener("click", monitorCalc);
       ["loadRate", "efficiency", "manualVa", "manualPf", "manualCells", "manualStrings", "manualEff", "manualBlockV"].forEach(id => {
         document.querySelector(`#${id}`).addEventListener("input", id.startsWith("manual") ? manualCalc : calculate);
       });
+      ["umModule", "umCabinet", "umIntegrated", "umIntegratedModule", "umModuleQty", "umIntegratedQty", "umSnmp", "umSnmpQty", "umLbs", "umLbsQty", "umParallel", "umParallelQty"].forEach(id => {
+        document.querySelector(`#${id}`).addEventListener("input", handleUmInput);
+        document.querySelector(`#${id}`).addEventListener("change", handleUmInput);
+      });
+      document.querySelectorAll("[data-um-mode]").forEach(button => {
+        button.addEventListener("click", () => setUmMode(button.dataset.umMode));
+      });
+      initUmSelectors();
       ["monitorCells", "monitorStrings", "monitorBlockV", "monitorTerminal", "monitorHallPerString", "monitorHmi", "monitorVm", "monitorService"].forEach(id => {
         document.querySelector(`#${id}`).addEventListener("input", monitorCalc);
         document.querySelector(`#${id}`).addEventListener("change", monitorCalc);
       });
       populateUps();
+      renderProjectItems();
       manualCalc();
       monitorCalc();
     }
@@ -868,20 +1732,45 @@
     function populateUps() {
       const seriesKey = document.querySelector("#series").value;
       const ups = document.querySelector("#ups");
-      ups.innerHTML = DATA[seriesKey].rows.map(item => `<option value="${item.model}">${item.model}｜${item.desc}</option>`).join("");
+      const isUm = seriesKey === "qilian";
+      document.querySelector("#upsField").hidden = isUm;
+      document.querySelector("#umConfig").hidden = !isUm;
+      document.querySelector("#umResult").hidden = !isUm;
+      ups.innerHTML = isUm ? "" : DATA[seriesKey].rows.map(item =>
+        `<option value="${item.model}">${item.model}｜${item.desc}｜${formatMoney(item.price)}</option>`
+      ).join("");
+      if (isUm) {
+        populateUmCabinets();
+        populateUmIntegratedModules();
+      }
       calculate();
     }
 
     function calculate() {
+      syncOutputVisibility();
+      if (isUmSelected()) {
+        calculateUm();
+        return;
+      }
+
       const row = getSelectedRow();
       const batterySeries = document.querySelector("#batterySeries").value;
       const duration = document.querySelector("#duration").value;
       const loadRate = Number(document.querySelector("#loadRate").value || 100) / 100;
       const efficiency = Number(document.querySelector("#efficiency").value || 0.92);
+      const units = totalUpsUnits();
       const recSet = row.recommendations[batterySeries] || {};
       const rec = recSet[duration];
       const notes = [];
       const loadPowerW = row.kva * 1000 * row.pf * loadRate;
+      const upsLine = quoteLine(row.code, row.model, "UPS 主机", units, row.price, `${row.desc}；${topologyText()}`, row.priceSource);
+      const batteryLine = getBatteryPriceLine(rec, units);
+      setPriceSummary(upsLine, batteryLine);
+      currentQuote = {
+        title: `${row.model} UPS 报价`,
+        lines: [upsLine, batteryLine].filter(Boolean),
+        notes: []
+      };
 
       if (!rec) {
         document.querySelector("#recBattery").textContent = "内置电池或未配置";
@@ -893,14 +1782,32 @@
         document.querySelector("#powerNeed").textContent = "-";
       } else {
         const qty = parseQty(rec.qty);
-        const requiredW = loadPowerW / Math.max(1, qty.cells * 6 * efficiency);
+        const cellCount = qty.cells * 6;
+        const requiredW = loadPowerW / Math.max(1, cellCount * efficiency * qty.strings);
+        const calcCurrent = loadPowerW / Math.max(1, qty.cells * 1.75 * 6 * efficiency * qty.strings);
         document.querySelector("#recBattery").textContent = rec.battery;
         document.querySelector("#recDuration").textContent = `${duration} 分钟推荐`;
-        document.querySelector("#recQty").textContent = rec.qty;
+        document.querySelector("#recQty").textContent = units > 1 ? `${rec.qty} / 台，合计 × ${units}` : rec.qty;
         document.querySelector("#dcVoltage").textContent = qty.cells ? `${qty.cells * 12}V DC，${qty.strings} 组` : "-";
         document.querySelector("#recCurrent").textContent = rec.current;
         document.querySelector("#switchLevel").textContent = `开关电压等级：${switchVoltage(qty.cells)}`;
         document.querySelector("#powerNeed").textContent = `${formatNumber(requiredW, 1)} W/cell`;
+        renderCalculationProcess([
+          `负载功率 PL = ${row.kva}kVA × 1000 × 功率因数 ${row.pf} × 负载率 ${formatNumber(loadRate * 100, 0)}% = ${formatNumber(loadPowerW, 0)}W。`,
+          `项目拓扑：${topologyText()}；电池按每台 UPS 独立配置，报价数量按 ${units} 台汇总。`,
+          `单组 ${qty.cells} 节 12V 电池，每节按 6 个 2V 单格计算；总参与单格数 = ${qty.cells} × 6 × ${qty.strings}组 = ${cellCount * qty.strings}。`,
+          `恒功率需求 W/cell = PL / (节数 × 6 × η × 组数) = ${formatNumber(loadPowerW, 0)} / (${qty.cells} × 6 × ${efficiency} × ${qty.strings}) = ${formatNumber(requiredW, 1)}W/cell。`,
+          `最大放电电流 I = PL / (节数 × 1.75 × 6 × η × 组数) = ${formatNumber(calcCurrent, 1)}A；配置表开关参考为 ${rec.current}。`,
+          `电池开关电压等级按单组节数 ${qty.cells} 节选择：${switchVoltage(qty.cells)}。`
+        ]);
+      }
+
+      if (!rec) {
+        renderCalculationProcess([
+          `负载功率 PL = ${row.kva}kVA × 1000 × 功率因数 ${row.pf} × 负载率 ${formatNumber(loadRate * 100, 0)}% = ${formatNumber(loadPowerW, 0)}W。`,
+          `项目拓扑：${topologyText()}；报价数量按 ${units} 台 UPS 汇总。`,
+          "当前机型未匹配到外置电池推荐行，页面不展开 W/cell 计算；如需长延时方案，请切换长机型号或使用项目手动核算。"
+        ]);
       }
 
       document.querySelector("#loadPower").textContent = `负载功率 ${formatNumber(loadPowerW, 0)} W`;
@@ -908,20 +1815,425 @@
       if (row.note) notes.push({ type: "warn", text: row.note });
       if (row.battery.includes("-")) notes.push({ type: "note", text: `该机型电池节数范围：${row.battery}，现场可根据功率降额规则调整。` });
       if (!rec) notes.push({ type: "warn", text: "该型号为标机或内置电池，配置表未给出外置电池推荐。若需要外接长延时，请切换到对应长机型号或使用手动核算。" });
+      if (!row.price) notes.push({ type: "warn", text: `${row.model} 未在当前价格表匹配到价格，导出报价中会保留为待补价。` });
+      if (rec && !batteryLine?.price) notes.push({ type: "warn", text: `${rec.battery} 未在当前电池价格表匹配到价格，导出报价中会保留为待补价。` });
       notes.push({ type: "note", text: `UPS：${row.model}，功率因数 ${row.pf}，容量约 ${row.kva}kVA，尺寸/高度 ${row.height}。` });
+      notes.push({ type: "note", text: `项目拓扑：${topologyText()}；当前报价按 ${units} 台 UPS 汇总，蓄电池按每台 UPS 独立配置。` });
+      if (parallelUnits() > 1) notes.push({ type: "warn", text: "并机项目需按现场距离配置并机线缆；TPL/UM 并机线通常按设备台数成环配置，长度按 3m/5m/10m/15m/20m 等规格复核。" });
+      if (row.priceSource) notes.push({ type: "note", text: `UPS 参考价来源：${row.priceSource}。` });
 
       document.querySelector("#notes").innerHTML = notes.map(item => `<div class="note ${item.type === "warn" ? "warn" : ""}">${item.text}</div>`).join("");
+      renderSalesAdvice(standardAdviceForRow(row, rec));
+      currentQuote.notes = [...notes.map(item => item.text), ...currentCalculationSteps, ...currentSalesAdvice];
       renderOptions(row, batterySeries);
       syncManual(row, rec);
       syncMonitor(row, rec, loadPowerW, efficiency);
+      renderQuoteDiscounts();
+    }
+
+    function initUmSelectors() {
+      const data = DATA.qilian;
+      document.querySelector("#umModule").innerHTML = data.modules.map(module =>
+        `<option value="${module.id}">${module.kva}kVA｜${module.model}${module.lithium ? "｜锂电版" : ""}</option>`
+      ).join("");
+      document.querySelector("#umIntegrated").innerHTML = data.integrated.map(frame =>
+        `<option value="${frame.id}">${frame.model}｜${frame.code}｜${frame.lithium ? "锂电版｜" : ""}${frame.desc}</option>`
+      ).join("");
+      document.querySelector("#umLbs").innerHTML = `<option value="">不选</option>` + data.accessories.lbs.map(item =>
+        `<option value="${item.code}">${item.name}｜${formatMoney(item.price)}</option>`
+      ).join("");
+      document.querySelector("#umParallel").innerHTML = `<option value="">不选</option>` + data.accessories.parallel.map(item =>
+        `<option value="${item.code}">${item.name}｜${formatMoney(item.price)}</option>`
+      ).join("");
+      populateUmCabinets();
+      populateUmIntegratedModules();
+    }
+
+    function setUmMode(mode) {
+      document.querySelector("#umModeModular").classList.toggle("active", mode === "modular");
+      document.querySelector("#umModeIntegrated").classList.toggle("active", mode === "integrated");
+      document.querySelector("#umModularFields").hidden = mode !== "modular";
+      document.querySelector("#umIntegratedFields").hidden = mode !== "integrated";
+      calculate();
+    }
+
+    function getUmMode() {
+      return document.querySelector("#umModeIntegrated").classList.contains("active") ? "integrated" : "modular";
+    }
+
+    function handleUmInput(event) {
+      if (event?.target?.id === "umModule") populateUmCabinets();
+      if (event?.target?.id === "umIntegrated") populateUmIntegratedModules();
+      calculate();
+    }
+
+    function selectedById(items, id) {
+      return items.find(item => item.id === id || item.code === id) || items[0];
+    }
+
+    function populateUmCabinets() {
+      const data = DATA.qilian;
+      const module = selectedById(data.modules, document.querySelector("#umModule").value);
+      const cabinets = data.cabinets.filter(cabinet => cabinet.moduleKva === module.kva && cabinet.lithium === module.lithium);
+      const cabinetSelect = document.querySelector("#umCabinet");
+      const previous = cabinetSelect.value;
+      cabinetSelect.innerHTML = cabinets.map(cabinet =>
+        `<option value="${cabinet.id}">${cabinet.capacity}kVA｜${cabinet.model}｜${cabinet.switchConfig}｜${formatMoney(cabinet.price)}</option>`
+      ).join("");
+      if (cabinets.some(cabinet => cabinet.id === previous)) cabinetSelect.value = previous;
+      syncUmModuleQtyLimit();
+    }
+
+    function populateUmIntegratedModules() {
+      const data = DATA.qilian;
+      const frame = selectedById(data.integrated, document.querySelector("#umIntegrated").value);
+      const modules = data.modules.filter(module => frame.moduleKvas.includes(module.kva) && module.lithium === frame.lithium);
+      const moduleSelect = document.querySelector("#umIntegratedModule");
+      const previous = moduleSelect.value;
+      moduleSelect.innerHTML = modules.map(module =>
+        `<option value="${module.id}">${module.kva}kVA｜${module.model}｜${formatMoney(module.price)}</option>`
+      ).join("");
+      if (modules.some(module => module.id === previous)) moduleSelect.value = previous;
+      syncUmIntegratedQtyLimit();
+    }
+
+    function clampInput(input, min, max) {
+      input.min = min;
+      input.max = max;
+      const value = Math.max(min, Math.min(max, Number(input.value || min)));
+      input.value = value;
+      return value;
+    }
+
+    function syncUmModuleQtyLimit() {
+      const data = DATA.qilian;
+      const cabinet = selectedById(data.cabinets, document.querySelector("#umCabinet").value);
+      return clampInput(document.querySelector("#umModuleQty"), 1, cabinet.maxModules || 1);
+    }
+
+    function syncUmIntegratedQtyLimit() {
+      const data = DATA.qilian;
+      const module = selectedById(data.modules, document.querySelector("#umIntegratedModule").value);
+      const max = Math.floor(125 / Math.max(1, module.kva));
+      return clampInput(document.querySelector("#umIntegratedQty"), 1, max);
+    }
+
+    function getUmAccessoryLines() {
+      const data = DATA.qilian;
+      const lines = [];
+      if (document.querySelector("#umSnmp").checked) {
+        const qty = Math.max(1, Number(document.querySelector("#umSnmpQty").value || 1));
+        lines.push({ ...data.accessories.snmp, qty, desc: data.accessories.snmp.desc });
+      }
+      const lbs = data.accessories.lbs.find(item => item.code === document.querySelector("#umLbs").value);
+      const lbsQty = Math.max(0, Number(document.querySelector("#umLbsQty").value || 0));
+      if (lbs && lbsQty > 0) lines.push({ ...lbs, qty: lbsQty, desc: "LBS 线缆，可选配件" });
+      const parallel = data.accessories.parallel.find(item => item.code === document.querySelector("#umParallel").value);
+      const parallelQty = Math.max(0, Number(document.querySelector("#umParallelQty").value || 0));
+      if (parallel && parallelQty > 0) lines.push({ ...parallel, qty: parallelQty, desc: "并机线缆，可选配件" });
+      return lines;
+    }
+
+    function getUmSelection() {
+      const data = DATA.qilian;
+      const mode = getUmMode();
+      if (mode === "integrated") {
+        const frame = selectedById(data.integrated, document.querySelector("#umIntegrated").value);
+        const module = selectedById(data.modules, document.querySelector("#umIntegratedModule").value);
+        const qty = syncUmIntegratedQtyLimit();
+        const capacity = module.kva * qty;
+        return {
+          mode,
+          modeText: "一体化 UPS",
+          cabinet: frame,
+          module,
+          qty,
+          capacity,
+          lines: [
+            { code: frame.code, model: frame.model, name: "一体化机框", qty: 1, price: frame.price, desc: frame.desc },
+            { code: module.code, model: module.model, name: "功率模块", qty, price: module.price, desc: module.desc }
+          ]
+        };
+      }
+
+      const module = selectedById(data.modules, document.querySelector("#umModule").value);
+      const cabinet = selectedById(data.cabinets, document.querySelector("#umCabinet").value);
+      const qty = syncUmModuleQtyLimit();
+      const capacity = module.kva * qty;
+      return {
+        mode,
+        modeText: "模块/机柜",
+        cabinet,
+        module,
+        qty,
+        capacity,
+        lines: [
+          { code: cabinet.code, model: cabinet.model, name: "机柜", qty: 1, price: cabinet.price, desc: cabinet.desc },
+          { code: module.code, model: module.model, name: "功率模块", qty, price: module.price, desc: module.desc }
+        ]
+      };
+    }
+
+    function getUmBatterySeriesKey() {
+      const series = document.querySelector("#batterySeries").value;
+      if (series === "gfmd") return "gfmd";
+      if (series === "gbt") return "gbt";
+      return "sp";
+    }
+
+    function getUmBatteryProfileKey(selection) {
+      if (selection.module.kva === 25) return "25";
+      if (selection.module.kva === 30) return "30";
+      if (selection.capacity >= 350) return "350";
+      return "50";
+    }
+
+    function getUmBatterySet(selection) {
+      const profile = getUmBatteryProfileKey(selection);
+      const series = getUmBatterySeriesKey();
+      if (series === "gbt") return calculateUmGbtSet(selection);
+      return UM_BATTERY_DATA[profile]?.[series]?.[selection.capacity] || {};
+    }
+
+    function getUmGbtBaseRec(selection, duration) {
+      const profile = getUmBatteryProfileKey(selection);
+      const baseSet = UM_BATTERY_DATA[profile]?.sp?.[selection.capacity] || {};
+      return baseSet[duration] || baseSet["60"] || baseSet["30"] || baseSet["15"];
+    }
+
+    function calculateUmGbtSet(selection) {
+      return durations.reduce((acc, duration) => {
+        const rec = calculateUmGbtRec(selection, duration);
+        if (rec) acc[duration] = rec;
+        return acc;
+      }, {});
+    }
+
+    function calculateUmGbtRec(selection, duration) {
+      const base = getUmGbtBaseRec(selection, duration);
+      if (!base) return undefined;
+
+      const loadRate = Number(document.querySelector("#loadRate").value || 100) / 100;
+      const efficiency = Number(document.querySelector("#efficiency").value || 0.92);
+      const loadPowerW = selection.capacity * 1000 * loadRate;
+      const blockV = 12;
+      const cells = base.cells;
+      const minStrings = Math.max(1, base.strings || 1);
+      const maxStrings = Math.max(60, minStrings + 40);
+      const usableModels = GBT_POWER_DATA.filter(item => Number(item.power?.[duration]) > 0);
+
+      for (let strings = minStrings; strings <= maxStrings; strings += 1) {
+        const requiredW = loadPowerW / Math.max(1, cells * 6 * efficiency * strings);
+        const model = usableModels.find(item => item.power[duration] >= requiredW);
+        if (!model) continue;
+
+        const currentA = loadPowerW / Math.max(1, cells * 10.5 * efficiency);
+        const priceInfo = getBatteryPrice(model.model);
+        return {
+          battery: model.model,
+          cells,
+          strings,
+          currentA,
+          blockV,
+          capacityAh: model.capacityAh,
+          weightKg: model.weightKg,
+          terminal: getBatteryProduct(model.model)?.terminal || "",
+          code: priceInfo?.code || "",
+          price: priceInfo?.price || 0,
+          priceSource: priceInfo?.source || "",
+          powerPerCell: model.power[duration],
+          requiredW,
+          calculated: true,
+          baseDuration: base === (UM_BATTERY_DATA[getUmBatteryProfileKey(selection)]?.sp?.[selection.capacity] || {})[duration] ? duration : null,
+          qty: `${strings}组*${cells}节`,
+          current: `${formatNumber(currentA, 1)}A`
+        };
+      }
+
+      return undefined;
+    }
+
+    function getUmBatteryRec(selection) {
+      const duration = document.querySelector("#duration").value;
+      return getUmBatterySet(selection)[duration];
+    }
+
+    function dcTextForRec(rec) {
+      if (!rec) return "-";
+      return `${rec.cells * rec.blockV}V DC，${rec.strings} 组`;
+    }
+
+    function umSalesAdvice(selection, rec) {
+      const advice = [
+        `UM 按销售配置指导采用“机柜/机框 + 功率模块”方式报价：当前 ${selection.module.kva}kVA 模块 × ${selection.qty}，输出容量 ${selection.capacity}kVA。`
+      ];
+      if (selection.mode === "integrated") {
+        advice.push("一体化 UPS 机框需与 25kVA 或 30kVA 功率模块组合，模块数量不超过 125kVA 机框容量。");
+      } else {
+        advice.push(`当前机柜最大支持 ${selection.cabinet.maxModules || 1} 个模块；模块数量不要超过机柜满配容量，后续扩容需预留空槽位。`);
+      }
+      if (rec) {
+        advice.push(`蓄电池按 UM 配置表当前后备时间推荐 ${rec.battery}，${rec.qty}，直流母线 ${dcTextForRec(rec)}。`);
+        advice.push(batterySwitchAdvice(rec));
+      }
+      advice.push("SNMP 卡、LBS 线缆、并机线缆均为选配；并机方案按设备数量和现场距离选择线缆长度。");
+      if (selection.module.lithium) {
+        advice.push("当前选择锂电版功率模块/机柜，铅酸电池推荐仅作参考，正式方案需按锂电系统销售资料配置。");
+      }
+      return advice;
+    }
+
+    function calculateUm() {
+      const selection = getUmSelection();
+      const duration = document.querySelector("#duration").value;
+      const batterySeries = document.querySelector("#batterySeries").value;
+      const rec = getUmBatteryRec(selection);
+      const loadRate = Number(document.querySelector("#loadRate").value || 100) / 100;
+      const efficiency = Number(document.querySelector("#efficiency").value || 0.92);
+      const units = totalUpsUnits();
+      const loadPowerW = selection.capacity * 1000 * loadRate;
+      const accessoryLines = getUmAccessoryLines();
+      const allLines = [...selection.lines, ...accessoryLines].map(line => ({ ...line, qty: line.qty * units, desc: `${line.desc}${units > 1 ? `；${topologyText()}` : ""}` }));
+      const accessoryTotal = accessoryLines.reduce((sum, line) => sum + line.price * line.qty * units, 0);
+      const total = allLines.reduce((sum, line) => sum + line.price * line.qty, 0);
+      const upsQuoteLines = allLines.map(line => quoteLine(line.code, line.model, line.name, line.qty, line.price, line.desc, "UPS产品目录价 iTeaQ-2025-01"));
+      const batteryLine = getBatteryPriceLine(rec, units);
+      setPriceSummary(upsQuoteLines[0], batteryLine, upsQuoteLines.slice(1));
+      currentQuote = {
+        title: `${selection.capacity}kVA 祁连 UM UPS 报价`,
+        lines: [...upsQuoteLines, batteryLine].filter(Boolean),
+        notes: []
+      };
+
+      document.querySelector("#umCapacity").value = `${selection.capacity} kVA`;
+      document.querySelector("#recBattery").textContent = rec ? rec.battery : "配置表无推荐";
+      document.querySelector("#recDuration").textContent = rec
+        ? `${duration} 分钟推荐，${rec.blockV}V / ${rec.capacityAh}Ah`
+        : `${selection.capacity}kVA，当前时长无 UM 电池行`;
+      document.querySelector("#recQty").textContent = rec ? (units > 1 ? `${rec.qty} / 台，合计 × ${units}` : rec.qty) : `${selection.qty} 个模块`;
+      document.querySelector("#dcVoltage").textContent = rec ? dcTextForRec(rec) : `电池节数范围：${DATA.qilian.batteryRange}`;
+      document.querySelector("#recCurrent").textContent = rec ? rec.current : "按手动核算";
+      document.querySelector("#switchLevel").textContent = rec ? `开关电压等级：${switchVoltage(rec.blockV === 12 ? rec.cells : Math.ceil(rec.cells / 6))}` : "电池开关按项目复核";
+      document.querySelector("#powerNeed").textContent = rec
+        ? `${formatNumber(loadPowerW / Math.max(1, rec.cells * (rec.blockV / 2) * efficiency * rec.strings), 1)} W/cell`
+        : "-";
+      document.querySelector("#loadPower").textContent = `负载功率 ${formatNumber(loadPowerW, 0)} W`;
+      if (rec) {
+        const cellPerBlock = rec.blockV / 2;
+        const requiredW = loadPowerW / Math.max(1, rec.cells * cellPerBlock * efficiency * rec.strings);
+        const calcCurrent = loadPowerW / Math.max(1, rec.cells * 1.75 * cellPerBlock * efficiency * rec.strings);
+        renderCalculationProcess([
+          `UM 输出容量 = ${selection.module.kva}kVA 模块 × ${selection.qty} = ${selection.capacity}kVA；负载功率 PL = ${selection.capacity}kVA × 1000 × 负载率 ${formatNumber(loadRate * 100, 0)}% = ${formatNumber(loadPowerW, 0)}W。`,
+          `项目拓扑：${topologyText()}；电池按每台 UPS 独立配置，报价数量按 ${units} 台汇总。`,
+          `${rec.blockV}V 电池每节按 ${cellPerBlock} 个 2V 单格计算；总参与单格数 = ${rec.cells} × ${cellPerBlock} × ${rec.strings}组 = ${rec.cells * cellPerBlock * rec.strings}。`,
+          `恒功率需求 W/cell = PL / (节数 × 单格数 × η × 组数) = ${formatNumber(loadPowerW, 0)} / (${rec.cells} × ${cellPerBlock} × ${efficiency} × ${rec.strings}) = ${formatNumber(requiredW, 1)}W/cell。`,
+          `最大放电电流 I = PL / (节数 × 1.75 × 单格数 × η × 组数) = ${formatNumber(calcCurrent, 1)}A；配置表开关参考为 ${rec.current}。`,
+          `电池开关电压等级按单组等效 12V 节数 ${rec.blockV === 12 ? rec.cells : Math.ceil(rec.cells / 6)} 选择：${switchVoltage(rec.blockV === 12 ? rec.cells : Math.ceil(rec.cells / 6))}。`
+        ]);
+      } else {
+        renderCalculationProcess([
+          `UM 输出容量 = ${selection.module.kva}kVA 模块 × ${selection.qty} = ${selection.capacity}kVA；负载功率 PL = ${selection.capacity}kVA × 1000 × 负载率 ${formatNumber(loadRate * 100, 0)}% = ${formatNumber(loadPowerW, 0)}W。`,
+          `项目拓扑：${topologyText()}；报价数量按 ${units} 台 UPS 汇总。`,
+          "当前容量/后备时间未匹配到 UM 电池配置行，页面不展开 W/cell 计算；请切换后备时间或用项目参数手动复核。"
+        ]);
+      }
+
+      document.querySelector("#umResultCapacity").textContent = units > 1 ? `${selection.capacity} kVA / 台` : `${selection.capacity} kVA`;
+      document.querySelector("#umResultMode").textContent = `${selection.modeText}；${topologyText()}`;
+      document.querySelector("#umResultCabinet").textContent = selection.cabinet.model;
+      document.querySelector("#umResultCabinetPrice").textContent = `${selection.cabinet.code} / ${formatMoney(selection.cabinet.price)} × ${units}`;
+      document.querySelector("#umResultModule").textContent = `${selection.module.model} × ${selection.qty * units}`;
+      document.querySelector("#umResultModulePrice").textContent = `${selection.module.code} / ${formatMoney(selection.module.price)} × ${selection.qty * units}`;
+      document.querySelector("#umResultTotal").textContent = formatMoney(total);
+      document.querySelector("#umResultAccessoryTotal").textContent = `配件小计 ${formatMoney(accessoryTotal)}`;
+      document.querySelector("#umPriceBody").innerHTML = allLines.map(line => `<tr>
+        <td>${line.code}</td>
+        <td>${line.model}</td>
+        <td>${line.name}</td>
+        <td>${line.qty}</td>
+        <td>${formatMoney(line.price)}</td>
+        <td>${formatMoney(line.price * line.qty)}</td>
+        <td>${line.desc}</td>
+      </tr>`).join("");
+
+      const notes = [
+        { type: "note", text: "UM 为模块化 UPS：页面按功率模块容量 × 模块数量得到整机容量，再匹配 UM 蓄电池配置表。" },
+        { type: "note", text: `当前配置：${selection.modeText}，${selection.module.kva}kVA 模块 × ${selection.qty}，输出容量 ${selection.capacity}kVA。` },
+        { type: "note", text: `项目拓扑：${topologyText()}；当前报价按 ${units} 台 UPS 汇总，蓄电池按每台 UPS 独立配置。` },
+        ...(parallelUnits() > 1 ? [{ type: "warn", text: "并机项目需按现场距离配置并机线缆；UM/UE 并机线可选 5m/10m/15m/20m，数量按并机台数成环复核。" }] : []),
+        { type: "note", text: rec ? `电池匹配：${rec.battery}，${rec.qty}${rec.weightKg ? `，单体重量约 ${formatNumber(rec.weightKg, 1)}kg` : ""}。` : "当前容量/时长未找到推荐行，可切换 15/30/60/120 分钟或用手动核算。" },
+        { type: selection.module.lithium ? "warn" : "note", text: selection.module.lithium ? "当前选择的是锂电版功率模块/机柜；本页 UM 蓄电池配置表为铅酸电池推荐，锂电方案需按锂电系统资料单独配置。" : "当前 UM 电池推荐按铅酸电池配置表匹配。" },
+        { type: "note", text: "UPS 目录价合计仅含机柜/机框、功率模块和所选常用配件，不含蓄电池、工程材料、安装调试和运保费用。" },
+        ...(rec && !batteryLine?.price ? [{ type: "warn", text: `${rec.battery} 未在当前电池价格表匹配到价格，导出报价中会保留为待补价。` }] : []),
+        { type: "note", text: batterySeries === "gbt" ? "GBT 自动匹配按 1.75V/cell 恒功率 W/cell 计算：沿用 UM 12V 配置表的直流节数，若单组功率不足则自动增加并联组数。" : "UM 电池节数和组数来自配置表，型号、容量、重量、端子已按 07】铅酸电池彩页校准；报价前请结合项目直流节数要求复核。" },
+        ...(rec?.calculated ? [{ type: "note", text: `GBT 计算校验：需求 ${formatNumber(rec.requiredW, 1)} W/cell，${rec.battery} 可用 ${formatNumber(rec.powerPerCell, 1)} W/cell。` }] : [])
+      ];
+      document.querySelector("#notes").innerHTML = notes.map(item => `<div class="note ${item.type === "warn" ? "warn" : ""}">${item.text}</div>`).join("");
+      renderSalesAdvice(umSalesAdvice(selection, rec));
+      currentQuote.notes = [...notes.map(item => item.text), ...currentCalculationSteps, ...currentSalesAdvice];
+      renderUmOptions(selection);
+      syncUmManual(selection, loadPowerW, efficiency, rec);
+      syncUmMonitor(selection, loadPowerW, efficiency, rec);
+      renderQuoteDiscounts();
+    }
+
+    function renderUmOptions(selection) {
+      const batterySet = getUmBatterySet(selection);
+      const units = totalUpsUnits();
+      document.querySelector("#optionsBody").innerHTML = durations.map(duration => {
+        const rec = batterySet[duration];
+        const batteryLine = getBatteryPriceLine(rec, units);
+        return `<tr>
+          <td><span class="pill">${duration} min</span></td>
+          ${rec ? `
+            <td>${rec.battery}</td>
+            <td>${rec.qty}</td>
+            <td>${rec.current}</td>
+            <td>${rec.cells}</td>
+            <td>${dcTextForRec(rec)}</td>
+            <td>${formatMoney(batteryLine?.price || 0)}</td>
+            <td>${formatMoney(batteryLine?.amount || 0)}</td>
+          ` : `<td colspan="7" class="muted">UM 配置表无该时长推荐电池</td>`}
+        </tr>`;
+      }).join("");
+    }
+
+    function syncUmManual(selection, loadPowerW, efficiency, rec) {
+      document.querySelector("#manualVa").value = Math.round(selection.capacity * 1000);
+      document.querySelector("#manualPf").value = 1;
+      document.querySelector("#manualCells").value = rec?.cells || 40;
+      document.querySelector("#manualStrings").value = rec?.strings || 1;
+      document.querySelector("#manualEff").value = efficiency;
+      document.querySelector("#manualBlockV").value = rec?.blockV || 12;
+      manualCalc();
+    }
+
+    function syncUmMonitor(selection, loadPowerW, efficiency, rec) {
+      const cells = rec?.cells || 40;
+      const strings = (rec?.strings || 1) * totalUpsUnits();
+      const blockV = rec?.blockV || 12;
+      const current = rec?.currentA ? rec.currentA / Math.max(1, rec?.strings || 1) : loadPowerW / Math.max(1, cells * (blockV === 12 ? 10.5 : 1.75) * efficiency * (rec?.strings || 1));
+      currentMonitorBatteryModel = rec?.battery || "";
+      const terminalInfo = inferTerminalFromBattery(rec?.battery || "");
+      currentMonitorTerminalNote = rec
+        ? `${rec.battery} 已按 UM 配置表和彩页参数联动监控仪规模；${terminalInfo.note}`
+        : "UM 配置已联动容量和估算电流；电池型号、组数、节数和极柱需按项目配置表复核后调整。";
+      document.querySelector("#monitorCells").value = cells;
+      document.querySelector("#monitorStrings").value = strings;
+      document.querySelector("#monitorBlockV").value = blockV;
+      document.querySelector("#monitorCurrent").value = Math.ceil(current);
+      document.querySelector("#monitorTerminal").value = terminalInfo.terminal;
+      monitorCalc();
     }
 
     function renderOptions(row, batterySeries) {
       const recSet = row.recommendations[batterySeries] || {};
+      const units = totalUpsUnits();
       document.querySelector("#optionsBody").innerHTML = durations.map(duration => {
         const rec = recSet[duration];
-        if (!rec) return `<tr><td>${duration} min</td><td colspan="5" class="muted">配置表无外置电池推荐</td></tr>`;
+        if (!rec) return `<tr><td>${duration} min</td><td colspan="7" class="muted">配置表无外置电池推荐</td></tr>`;
         const qty = parseQty(rec.qty);
+        const batteryLine = getBatteryPriceLine(rec, units);
         return `<tr>
           <td><span class="pill">${duration} min</span></td>
           <td>${rec.battery}</td>
@@ -929,6 +2241,8 @@
           <td>${rec.current}</td>
           <td>${qty.cells || "-"}</td>
           <td>${qty.cells ? qty.cells * 12 + "V / " + switchVoltage(qty.cells) : "-"}</td>
+          <td>${formatMoney(batteryLine?.price || 0)}</td>
+          <td>${formatMoney(batteryLine?.amount || 0)}</td>
         </tr>`;
       }).join("");
     }
@@ -946,9 +2260,9 @@
     function syncMonitor(row, rec, loadPowerW, efficiency) {
       const qty = rec ? parseQty(rec.qty) : { cells: Number(String(row.battery).match(/\d+/)?.[0] || 20), strings: 1 };
       const cells = qty.cells || 20;
-      const strings = qty.strings || 1;
+      const strings = (qty.strings || 1) * totalUpsUnits();
       const current = loadPowerW / Math.max(1, cells * 10.5 * efficiency);
-      const branchCurrent = strings >= 2 ? current / Math.max(1, strings - 1) : current;
+      const branchCurrent = (qty.strings || 1) >= 2 ? current / Math.max(1, (qty.strings || 1) - 1) : current;
       const terminalInfo = inferTerminalFromBattery(rec?.battery || "");
       currentMonitorBatteryModel = rec?.battery || "";
       currentMonitorTerminalNote = terminalInfo.note;
@@ -962,21 +2276,17 @@
     function inferTerminalFromBattery(model) {
       const normalized = String(model || "").toUpperCase();
       const capacity = Number(normalized.match(/(?:SPG12|SP12-|GBT12-)(\d+)/)?.[1] || 0);
+      const product = getBatteryProduct(model);
 
       if (!normalized) {
         return { terminal: "M6", note: "未匹配到外置电池型号，测试线默认按 M6 估算。" };
       }
 
-      if (/SP12-(24|26)B?/.test(normalized)) {
-        return { terminal: "M6", note: `${model} 资料端子为 M5，SBMS 标准测试线从 M6 起，请现场复核是否需转接。` };
-      }
-
-      if (/SPG12(120|160|185)B?/.test(normalized)) {
-        return { terminal: "M6", note: `${model} 按资料端子匹配 M6 测试线。` };
-      }
-
-      if (/SPG12(750|800|890)B?/.test(normalized)) {
-        return { terminal: "M8", note: `${model} 按资料端子匹配 M8 测试线。` };
+      if (product?.terminal) {
+        if (product.terminal === "M5") {
+          return { terminal: "M6", note: `${product.model} 彩页端子为 M5，SBMS 标准测试线从 M6 起，请现场复核是否需转接。` };
+        }
+        return { terminal: product.terminal, note: `${product.model} 已按彩页端子匹配 ${product.terminal} 测试线。` };
       }
 
       if (capacity >= 300) {
@@ -1046,6 +2356,9 @@
       if (includeHmi) lines.push(item("88091157", "SBMS-HMI-6000", "显示屏", hosts, "7 寸触摸屏 HMI，1 台主机可配 1 个"));
       if (includeVm) lines.push(item("88091150", "SBMS-PBMS-VM", "组电压监控模块", strings, "选配件，每组电池 1 个"));
       if (includeService) lines.push(item("66040003", "UPS（其他全部）", "上门安装指导", 1, "标准产品仅含远程技术支持，现场指导需单独下单"));
+      currentMonitorQuoteLines = lines.map(line =>
+        quoteLine(line.code, line.model, line.name, line.qty, monitorCatalogPrices[priceKey(line)] || 0, line.desc, "电池监控仪目录价 iTeaQ-2025-11")
+      );
 
       document.querySelector("#monitorHost").textContent = `${hosts} 台`;
       document.querySelector("#monitorCellModule").textContent = `${totalCells} 个`;
@@ -1078,6 +2391,7 @@
       notes.push({ type: "note", text: "如果现场线缆过粗或两根线缆无法穿过一个霍尔，可将每组霍尔数量改为 2 个。" });
       notes.push({ type: "note", text: "目录价仅带入电池监控仪物料价格，不含工程材料、安装、调试、运保等项目费用。" });
       document.querySelector("#monitorNotes").innerHTML = notes.map(item => `<div class="note ${item.type === "warn" ? "warn" : ""}">${item.text}</div>`).join("");
+      renderQuoteDiscounts();
     }
 
     function item(code, model, name, qty, desc) {
@@ -1095,6 +2409,394 @@
         if (cell) cell.textContent = formatMoney(subtotal);
       });
       document.querySelector("#monitorPriceTotal").textContent = formatMoney(total);
+    }
+
+    function currentConfigLabel() {
+      if (isUmSelected()) {
+        const selection = getUmSelection();
+        return `${selection.capacity}kVA 祁连 UM`;
+      }
+      return getSelectedRow()?.model || "UPS 配置";
+    }
+
+    function currentDurationText() {
+      return `${document.querySelector("#duration").value} min`;
+    }
+
+    function getCurrentQuoteLines() {
+      const quoteLines = currentQuote.lines.map(line => ({ ...line, category: line.name === "蓄电池" ? "蓄电池" : "UPS" }));
+      const monitorLines = monitorIncluded()
+        ? currentMonitorQuoteLines.map(line => ({ ...line, category: "电池监控仪" }))
+        : [];
+      return [...quoteLines, ...monitorLines];
+    }
+
+    function quoteRemarks() {
+      if (!projectItems.length) return (currentQuote.notes || []).join("\n");
+      return projectItems.map(item => [
+        `【${item.label}】${item.config}；${item.topology}；${item.duration}；${item.monitor ? "含电池监控仪" : "不含电池监控仪"}`,
+        ...item.notes
+      ].join("\n")).join("\n\n");
+    }
+
+    function addProjectItem() {
+      calculate();
+      const lines = getCurrentQuoteLines();
+      if (!lines.length) return;
+      const index = projectItems.length + 1;
+      const label = `项目${index}`;
+      const item = {
+        id: `${Date.now()}-${index}`,
+        label,
+        config: currentConfigLabel(),
+        topology: topologyText(),
+        duration: currentDurationText(),
+        monitor: monitorIncluded(),
+        notes: [...(currentQuote.notes || [])],
+        lines: lines.map(line => ({ ...line, category: `${label} / ${line.category}` }))
+      };
+      projectItems.push(item);
+      renderProjectItems();
+      renderQuoteDiscounts();
+    }
+
+    function clearProjectItems() {
+      projectItems = [];
+      renderProjectItems();
+      renderQuoteDiscounts();
+    }
+
+    function handleProjectClick(event) {
+      const button = event.target.closest("[data-project-delete]");
+      if (!button) return;
+      projectItems = projectItems.filter(item => item.id !== button.dataset.projectDelete);
+      renderProjectItems();
+      renderQuoteDiscounts();
+    }
+
+    function renderProjectItems() {
+      const body = document.querySelector("#projectBody");
+      const summary = document.querySelector("#projectSummary");
+      if (!projectItems.length) {
+        summary.textContent = "当前配置导出";
+        body.innerHTML = `<tr><td colspan="7" class="muted">尚未加入项目清单；直接导出时使用当前配置。</td></tr>`;
+        return;
+      }
+      const total = projectItems.reduce((sum, item) =>
+        sum + item.lines.reduce((lineSum, line) => lineSum + Number(line.amount || 0), 0), 0);
+      summary.textContent = `${projectItems.length} 个项目项`;
+      body.innerHTML = projectItems.map(item => {
+        const subtotal = item.lines.reduce((sum, line) => sum + Number(line.amount || 0), 0);
+        return `<tr>
+          <td>${item.label}</td>
+          <td>${item.config}</td>
+          <td>${item.topology}</td>
+          <td>${item.duration}</td>
+          <td>${item.monitor ? "需要" : "不需要"}</td>
+          <td>${formatMoney(subtotal)}</td>
+          <td><button class="secondary" type="button" data-project-delete="${item.id}">删除</button></td>
+        </tr>`;
+      }).join("") + `<tr><td colspan="5"><strong>项目清单目录合计</strong></td><td colspan="2"><strong>${formatMoney(total)}</strong></td></tr>`;
+    }
+
+    function lineKey(line) {
+      return [line.category || "", line.code || "", line.model || "", line.name || ""].join("|");
+    }
+
+    function getAllQuoteLines() {
+      if (projectItems.length) return projectItems.flatMap(item => item.lines);
+      return getCurrentQuoteLines();
+    }
+
+    function discountPercentFor(line) {
+      const raw = quoteDiscounts[lineKey(line)];
+      if (raw === "" || raw === undefined || raw === null) return 100;
+      const value = Number(raw);
+      if (!Number.isFinite(value)) return 100;
+      return Math.max(0, Math.min(100, value));
+    }
+
+    function withDiscount(line) {
+      const discount = discountPercentFor(line);
+      const discountedPrice = Number(line.price || 0) * discount / 100;
+      const discountedAmount = discountedPrice * Number(line.qty || 0);
+      return { ...line, discount, discountedPrice, discountedAmount };
+    }
+
+    function handleDiscountInput(event) {
+      const input = event.target.closest("[data-discount-key]");
+      if (!input) return;
+      quoteDiscounts[input.dataset.discountKey] = input.value;
+      renderQuoteDiscounts();
+    }
+
+    function renderQuoteDiscounts() {
+      const lines = getAllQuoteLines().map(withDiscount);
+      const total = lines.reduce((sum, line) => sum + Number(line.discountedAmount || 0), 0);
+      document.querySelector("#quoteDiscountBody").innerHTML = lines.map(line => {
+        const key = lineKey(line);
+        const rawDiscount = quoteDiscounts[key] ?? "";
+        return `<tr>
+          <td>${line.category}</td>
+          <td>${line.code || "待补"}</td>
+          <td>${line.model}</td>
+          <td>${line.name}</td>
+          <td>${line.qty}</td>
+          <td>${formatMoney(line.price)}</td>
+          <td><input class="price-input" data-discount-key="${escapeExcel(key)}" type="number" min="0" max="100" step="0.01" placeholder="100" value="${escapeExcel(rawDiscount)}"></td>
+          <td>${formatMoney(line.discountedPrice)}</td>
+          <td>${formatMoney(line.discountedAmount)}</td>
+        </tr>`;
+      }).join("");
+      document.querySelector("#quoteDiscountTotal").textContent = `折后合计 ${formatMoney(total)}`;
+    }
+
+    function escapeExcel(value) {
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function escapeXml(value) {
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&apos;");
+    }
+
+    function colName(index) {
+      let name = "";
+      let value = index;
+      while (value > 0) {
+        const mod = (value - 1) % 26;
+        name = String.fromCharCode(65 + mod) + name;
+        value = Math.floor((value - mod) / 26);
+      }
+      return name;
+    }
+
+    function xlsxCell(rowIndex, colIndex, value, style = 0) {
+      const ref = `${colName(colIndex)}${rowIndex}`;
+      const styleAttr = style ? ` s="${style}"` : "";
+      if (value === null || value === undefined || value === "") return `<c r="${ref}"${styleAttr}/>`;
+      if (typeof value === "number" && Number.isFinite(value)) return `<c r="${ref}"${styleAttr}><v>${value}</v></c>`;
+      return `<c r="${ref}" t="inlineStr"${styleAttr}><is><t xml:space="preserve">${escapeXml(value)}</t></is></c>`;
+    }
+
+    function xlsxRow(rowIndex, values, styleResolver = () => 0) {
+      return `<row r="${rowIndex}">${values.map((value, index) => xlsxCell(rowIndex, index + 1, value, styleResolver(index, value))).join("")}</row>`;
+    }
+
+    function buildQuoteSheetXml(title, date, lines, total) {
+      const headers = ["序号", "类别", "编码", "型号", "名称", "数量", "目录单价", "折扣%", "折后单价", "折后小计", "说明", "价格来源", "备注"];
+      const remarks = quoteRemarks();
+      const exportPrice = value => canViewPrices() ? (value || "") : "****";
+      const rows = [
+        xlsxRow(1, [title], () => 1),
+        xlsxRow(2, [`导出日期：${date.toLocaleDateString("zh-CN")}；${canViewPrices() ? "折扣留空按 100% 目录价/参考价，空白单价表示待补价。" : "未授权导出，金额已隐藏为 ****。如需使用完整功能，请联系开发者 Michael jie。"}`], () => 5),
+        xlsxRow(3, headers, () => 2)
+      ];
+
+      lines.forEach((line, index) => {
+        rows.push(xlsxRow(4 + index, [
+          index + 1,
+          line.category,
+          line.code || "待补",
+          line.model,
+          line.name,
+          line.qty,
+          exportPrice(line.price),
+          line.discount,
+          exportPrice(line.discountedPrice),
+          exportPrice(line.discountedAmount),
+          line.desc || "",
+          line.source || "",
+          index === 0 ? remarks : ""
+        ], col => col >= 6 && col <= 9 ? 3 : 5));
+      });
+
+      const totalRow = 4 + lines.length;
+      rows.push(xlsxRow(totalRow, ["折后合计", "", "", "", "", "", "", "", "", exportPrice(total), "", "", ""], col => col === 9 ? 3 : 4));
+
+      return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <dimension ref="A1:M${totalRow}"/>
+  <cols>
+    <col min="1" max="1" width="8" customWidth="1"/>
+    <col min="2" max="3" width="14" customWidth="1"/>
+    <col min="4" max="5" width="26" customWidth="1"/>
+    <col min="6" max="6" width="10" customWidth="1"/>
+    <col min="7" max="10" width="14" customWidth="1"/>
+    <col min="11" max="12" width="38" customWidth="1"/>
+    <col min="13" max="13" width="56" customWidth="1"/>
+  </cols>
+  <sheetData>${rows.join("")}</sheetData>
+  <mergeCells count="3">
+    <mergeCell ref="A1:M1"/>
+    <mergeCell ref="A2:M2"/>
+    <mergeCell ref="A${totalRow}:I${totalRow}"/>
+  </mergeCells>
+  <pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/>
+</worksheet>`;
+    }
+
+    function buildQuoteXlsxBlob(title, date, lines, total) {
+      const files = {
+        "[Content_Types].xml": `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
+  <Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
+  <Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>
+  <Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>
+  <Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/>
+</Types>`,
+        "_rels/.rels": `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
+  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/>
+  <Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties" Target="docProps/app.xml"/>
+</Relationships>`,
+        "docProps/app.xml": `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties" xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes"><Application>UPS Battery Calculator</Application></Properties>`,
+        "docProps/core.xml": `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><dc:title>${escapeXml(title)}</dc:title><dc:creator>UPS Battery Calculator</dc:creator><dcterms:created xsi:type="dcterms:W3CDTF">${date.toISOString()}</dcterms:created></cp:coreProperties>`,
+        "xl/workbook.xml": `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="报价" sheetId="1" r:id="rId1"/></sheets></workbook>`,
+        "xl/_rels/workbook.xml.rels": `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>
+  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+</Relationships>`,
+        "xl/styles.xml": `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <numFmts count="1"><numFmt numFmtId="164" formatCode="&quot;¥&quot;#,##0.00"/></numFmts>
+  <fonts count="4"><font><sz val="11"/><name val="Microsoft YaHei"/></font><font><b/><sz val="14"/><color rgb="FFFFFFFF"/><name val="Microsoft YaHei"/></font><font><b/><sz val="11"/><name val="Microsoft YaHei"/></font><font><b/><sz val="11"/><name val="Microsoft YaHei"/></font></fonts>
+  <fills count="4"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF0F5F78"/><bgColor indexed="64"/></patternFill></fill><fill><patternFill patternType="solid"><fgColor rgb="FFDCEEF6"/><bgColor indexed="64"/></patternFill></fill></fills>
+  <borders count="2"><border><left/><right/><top/><bottom/><diagonal/></border><border><left style="thin"><color rgb="FF9CA3AF"/></left><right style="thin"><color rgb="FF9CA3AF"/></right><top style="thin"><color rgb="FF9CA3AF"/></top><bottom style="thin"><color rgb="FF9CA3AF"/></bottom><diagonal/></border></borders>
+  <cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>
+  <cellXfs count="6">
+    <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>
+    <xf numFmtId="0" fontId="1" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1"/>
+    <xf numFmtId="0" fontId="2" fillId="3" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>
+    <xf numFmtId="164" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1"/>
+    <xf numFmtId="0" fontId="3" fillId="3" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1"/>
+    <xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf>
+  </cellXfs>
+</styleSheet>`,
+        "xl/worksheets/sheet1.xml": buildQuoteSheetXml(title, date, lines, total)
+      };
+      return new Blob([zipStore(files)], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+    }
+
+    const CRC_TABLE = (() => {
+      const table = [];
+      for (let i = 0; i < 256; i++) {
+        let c = i;
+        for (let j = 0; j < 8; j++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+        table[i] = c >>> 0;
+      }
+      return table;
+    })();
+
+    function crc32(bytes) {
+      let crc = -1;
+      for (const byte of bytes) crc = (crc >>> 8) ^ CRC_TABLE[(crc ^ byte) & 0xff];
+      return (crc ^ -1) >>> 0;
+    }
+
+    function dosDateTime(date = new Date()) {
+      return {
+        time: (date.getHours() << 11) | (date.getMinutes() << 5) | Math.floor(date.getSeconds() / 2),
+        day: ((date.getFullYear() - 1980) << 9) | ((date.getMonth() + 1) << 5) | date.getDate()
+      };
+    }
+
+    function writeUint16(view, offset, value) {
+      view.setUint16(offset, value, true);
+    }
+
+    function writeUint32(view, offset, value) {
+      view.setUint32(offset, value >>> 0, true);
+    }
+
+    function zipStore(files) {
+      const encoder = new TextEncoder();
+      const now = dosDateTime();
+      const localParts = [];
+      const centralParts = [];
+      let offset = 0;
+
+      Object.entries(files).forEach(([name, content]) => {
+        const nameBytes = encoder.encode(name);
+        const data = encoder.encode(content);
+        const crc = crc32(data);
+        const local = new Uint8Array(30 + nameBytes.length);
+        const localView = new DataView(local.buffer);
+        writeUint32(localView, 0, 0x04034b50);
+        writeUint16(localView, 4, 20);
+        writeUint16(localView, 6, 0x0800);
+        writeUint16(localView, 8, 0);
+        writeUint16(localView, 10, now.time);
+        writeUint16(localView, 12, now.day);
+        writeUint32(localView, 14, crc);
+        writeUint32(localView, 18, data.length);
+        writeUint32(localView, 22, data.length);
+        writeUint16(localView, 26, nameBytes.length);
+        local.set(nameBytes, 30);
+        localParts.push(local, data);
+
+        const central = new Uint8Array(46 + nameBytes.length);
+        const centralView = new DataView(central.buffer);
+        writeUint32(centralView, 0, 0x02014b50);
+        writeUint16(centralView, 4, 20);
+        writeUint16(centralView, 6, 20);
+        writeUint16(centralView, 8, 0x0800);
+        writeUint16(centralView, 10, 0);
+        writeUint16(centralView, 12, now.time);
+        writeUint16(centralView, 14, now.day);
+        writeUint32(centralView, 16, crc);
+        writeUint32(centralView, 20, data.length);
+        writeUint32(centralView, 24, data.length);
+        writeUint16(centralView, 28, nameBytes.length);
+        writeUint32(centralView, 42, offset);
+        central.set(nameBytes, 46);
+        centralParts.push(central);
+        offset += local.length + data.length;
+      });
+
+      const centralSize = centralParts.reduce((sum, part) => sum + part.length, 0);
+      const end = new Uint8Array(22);
+      const endView = new DataView(end.buffer);
+      writeUint32(endView, 0, 0x06054b50);
+      writeUint16(endView, 8, centralParts.length);
+      writeUint16(endView, 10, centralParts.length);
+      writeUint32(endView, 12, centralSize);
+      writeUint32(endView, 16, offset);
+      return new Blob([...localParts, ...centralParts, end]);
+    }
+
+    function exportQuote() {
+      calculate();
+      const lines = getAllQuoteLines().map(withDiscount);
+      const total = lines.reduce((sum, line) => sum + Number(line.discountedAmount || 0), 0);
+      const date = new Date();
+      const stamp = `${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, "0")}${String(date.getDate()).padStart(2, "0")}`;
+      const title = projectItems.length ? "UPS 项目报价" : (currentQuote.title || "UPS 蓄电池报价");
+      const blob = buildQuoteXlsxBlob(title, date, lines, total);
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${title.replace(/[\\/:*?"<>|\\s]+/g, "_")}_${stamp}.xlsx`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
     }
 
     init();

@@ -537,6 +537,21 @@
       flex: 0 0 auto;
     }
 
+    .qr-thumb {
+      width: 48px;
+      height: 48px;
+      border: 0;
+      padding: 0;
+      background: transparent;
+      cursor: zoom-in;
+      border-radius: 6px;
+    }
+
+    .qr-thumb:focus-visible {
+      outline: 3px solid rgba(31, 122, 140, 0.22);
+      outline-offset: 2px;
+    }
+
     .contact-card img {
       width: 48px;
       height: 48px;
@@ -557,6 +572,70 @@
       color: var(--muted);
       font-size: 11px;
       line-height: 1.35;
+    }
+
+    .qr-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background: rgba(17, 31, 39, 0.68);
+    }
+
+    .qr-modal[hidden] {
+      display: none;
+    }
+
+    .qr-modal-card {
+      width: min(92vw, 520px);
+      background: #fff;
+      border-radius: 8px;
+      padding: 16px;
+      box-shadow: 0 20px 60px rgba(15, 23, 42, 0.28);
+    }
+
+    .qr-modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .qr-modal-head strong {
+      font-size: 16px;
+      color: var(--ink);
+    }
+
+    .qr-modal-close {
+      width: 36px;
+      height: 36px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #f8fafb;
+      color: var(--ink);
+      font-size: 24px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .qr-modal img {
+      display: block;
+      width: 100%;
+      max-height: min(72vh, 520px);
+      object-fit: contain;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .qr-modal small {
+      display: block;
+      margin-top: 10px;
+      color: var(--muted);
+      text-align: center;
     }
 
     .app-bar {
@@ -869,6 +948,7 @@
         grid-template-columns: 56px 1fr;
         align-items: center;
       }
+      .qr-thumb,
       .contact-card img {
         width: 56px;
         height: 56px;
@@ -925,10 +1005,12 @@
         <strong>权限验证</strong>
         <span>未授权访问时，页面和导出的报价会隐藏目录价、折后价和合计金额。如需使用完整功能，请联系开发者 Michael，对项目有建议请加微信，感谢您的反馈。</span>
         <div class="contact-card">
-          <img src="assets/michael-wechat.jpg" alt="Michael 微信二维码">
+          <button class="qr-thumb" id="openQrModal" type="button" aria-label="放大 Michael 微信二维码">
+            <img src="assets/michael-wechat.jpg" alt="Michael 微信二维码">
+          </button>
           <div>
             <b>联系开发者 Michael</b>
-            <small>扫码添加微信，申请完整功能权限，或反馈项目建议。</small>
+            <small>点击二维码放大，扫码添加微信，申请完整功能权限，或反馈项目建议。</small>
           </div>
         </div>
       </div>
@@ -942,6 +1024,17 @@
         <span class="auth-state" id="authState">未验证：目录价将显示为 ****</span>
       </div>
     </section>
+
+    <div class="qr-modal" id="qrModal" hidden aria-hidden="true">
+      <div class="qr-modal-card" role="dialog" aria-modal="true" aria-labelledby="qrModalTitle">
+        <div class="qr-modal-head">
+          <strong id="qrModalTitle">Michael 微信二维码</strong>
+          <button class="qr-modal-close" id="closeQrModal" type="button" aria-label="关闭二维码弹窗">×</button>
+        </div>
+        <img src="assets/michael-wechat.jpg" alt="Michael 微信二维码放大图">
+        <small>打开微信扫一扫，添加 Michael 申请完整功能权限或反馈建议。</small>
+      </div>
+    </div>
 
     <div class="grid">
       <section class="panel config-panel">
@@ -2162,6 +2255,33 @@
       });
     }
 
+    function initQrModal() {
+      const modal = document.querySelector("#qrModal");
+      const openButton = document.querySelector("#openQrModal");
+      const closeButton = document.querySelector("#closeQrModal");
+
+      function openModal() {
+        modal.hidden = false;
+        modal.setAttribute("aria-hidden", "false");
+        closeButton.focus();
+      }
+
+      function closeModal() {
+        modal.hidden = true;
+        modal.setAttribute("aria-hidden", "true");
+        openButton.focus();
+      }
+
+      openButton.addEventListener("click", openModal);
+      closeButton.addEventListener("click", closeModal);
+      modal.addEventListener("click", event => {
+        if (event.target === modal) closeModal();
+      });
+      document.addEventListener("keydown", event => {
+        if (event.key === "Escape" && !modal.hidden) closeModal();
+      });
+    }
+
     async function verifyAuthPhone() {
       const phone = normalizeAuthPhone(document.querySelector("#authPhone").value);
       if (!phone) {
@@ -2237,6 +2357,7 @@
 
     function init() {
       initAuth();
+      initQrModal();
       const series = document.querySelector("#series");
       series.innerHTML = Object.entries(DATA).map(([key, value]) => `<option value="${key}">${value.name}</option>`).join("");
       series.addEventListener("change", populateUps);

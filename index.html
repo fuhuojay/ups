@@ -2741,7 +2741,8 @@
     function renderUmOptions(selection) {
       const batterySet = getUmBatterySet(selection);
       const units = totalUpsUnits();
-      document.querySelector("#optionsBody").innerHTML = durations.map(duration => {
+      const duration = document.querySelector("#duration").value;
+      document.querySelector("#optionsBody").innerHTML = [duration].map(duration => {
         const rec = getDurationRec(batterySet, duration);
         const batteryLine = getBatteryPriceLine(rec, units);
         return `<tr>
@@ -2790,7 +2791,8 @@
     function renderOptions(row, batterySeries) {
       const recSet = row.recommendations[batterySeries] || {};
       const units = totalUpsUnits();
-      document.querySelector("#optionsBody").innerHTML = durations.map(duration => {
+      const duration = document.querySelector("#duration").value;
+      document.querySelector("#optionsBody").innerHTML = [duration].map(duration => {
         const rec = getDurationRec(recSet, duration);
         if (!rec) return `<tr><td>${duration} min</td><td colspan="7" class="muted">配置表无外置电池推荐</td></tr>`;
         const qty = parseQty(rec.qty);

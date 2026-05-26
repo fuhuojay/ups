@@ -574,6 +574,81 @@
       line-height: 1.35;
     }
 
+    .custom-battery {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px;
+      background: #fbfcfd;
+    }
+
+    .custom-battery-fields {
+      display: grid;
+      gap: 10px;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--line);
+    }
+
+    .custom-battery-summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 8px 10px;
+      border: 1px solid #d8e5e3;
+      border-radius: 6px;
+      background: #fff;
+    }
+
+    .custom-battery-summary strong {
+      color: var(--ink);
+      font-size: 14px;
+      overflow-wrap: anywhere;
+    }
+
+    .custom-battery-summary small {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .battery-picker-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      max-height: min(58vh, 460px);
+      overflow: auto;
+    }
+
+    .battery-picker-item {
+      text-align: left;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px;
+      background: #fff;
+      cursor: pointer;
+      color: var(--text);
+    }
+
+    .battery-picker-item:hover,
+    .battery-picker-item:focus-visible {
+      border-color: var(--brand-2);
+      box-shadow: 0 0 0 3px rgba(31, 122, 140, 0.12);
+      outline: none;
+    }
+
+    .battery-picker-item strong,
+    .battery-picker-item small {
+      display: block;
+    }
+
+    .battery-picker-item small {
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.35;
+    }
+
     .qr-modal {
       position: fixed;
       inset: 0;
@@ -831,6 +906,15 @@
         max-width: none;
       }
 
+      .custom-battery-summary {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .battery-picker-list {
+        grid-template-columns: 1fr;
+      }
+
       .workspace-tabs {
         display: grid;
         width: calc(100% - 24px);
@@ -1036,6 +1120,26 @@
       </div>
     </div>
 
+    <div class="qr-modal" id="batteryPickerModal" hidden aria-hidden="true">
+      <div class="qr-modal-card" role="dialog" aria-modal="true" aria-labelledby="batteryPickerTitle">
+        <div class="qr-modal-head">
+          <strong id="batteryPickerTitle">选择电池型号</strong>
+          <button class="qr-modal-close" id="closeBatteryPicker" type="button" aria-label="关闭电池选择窗口">×</button>
+        </div>
+        <label>
+          电池分类
+          <select id="batteryPickerFamily">
+            <option value="sp">SP-b 系列</option>
+            <option value="spg">SPG-b 系列</option>
+            <option value="gbt">GBT 系列</option>
+            <option value="gfmd">GFMD 2V 系列</option>
+          </select>
+        </label>
+        <div class="battery-picker-list" id="batteryPickerList"></div>
+        <small>选择后按客户指定数量反算预计后备时间，并将该电池带入报价。</small>
+      </div>
+    </div>
+
     <div class="grid">
       <section class="panel config-panel">
         <h2>配置选择</h2>
@@ -1131,6 +1235,7 @@
                 <option value="sp">SP-b 系列</option>
                 <option value="gbt">GBT 系列</option>
                 <option value="gfmd">GFMD 2V 系列</option>
+                <option value="" hidden></option>
               </select>
             </label>
             <label>
@@ -1145,8 +1250,40 @@
                 <option value="240">240 min</option>
                 <option value="300">300 min</option>
                 <option value="360">360 min</option>
+                <option value="" hidden></option>
               </select>
             </label>
+          </div>
+
+          <div class="custom-battery">
+            <label class="check-row">
+              <input id="customBatteryEnabled" type="checkbox">
+              客户指定电池型号/数量
+            </label>
+            <div id="customBatteryFields" class="custom-battery-fields" hidden>
+              <div class="custom-battery-summary">
+                <div>
+                  <strong id="customBatterySelected">未选择电池</strong>
+                  <small id="customBatteryMeta">点击选择电池型号</small>
+                </div>
+                <button class="secondary" id="openBatteryPicker" type="button">选择电池</button>
+              </div>
+              <div class="two">
+                <label>
+                  单组节数
+                  <input id="customBatteryCells" type="number" min="1" step="1" value="">
+                </label>
+                <label>
+                  组数
+                  <input id="customBatteryStrings" type="number" min="1" step="1" value="">
+                </label>
+              </div>
+              <label>
+                反算后备时间
+                <input id="customBatteryRuntime" type="text" value="-" readonly>
+              </label>
+              <p class="source" id="customBatteryNote">指定型号时，页面会按单组节数和组数反算预计后备时间。</p>
+            </div>
           </div>
 
           <div class="two">
@@ -1202,7 +1339,7 @@
           </div>
           <div class="summary">
           <div class="metric">
-            <span>推荐电池</span>
+            <span id="recBatteryLabel">推荐电池</span>
             <strong id="recBattery">-</strong>
             <small id="recDuration">-</small>
           </div>
@@ -1602,6 +1739,9 @@
     let projectItems = [];
     let isPriceAuthorized = false;
     let activeWorkspaceTab = "config";
+    let selectedCustomBatteryModel = "";
+    let lockedBatterySeriesValue = "sp";
+    let lockedDurationValue = "15";
     const AUTH_STORAGE_KEY = "ups-price-auth-hash";
     const quoteDiscounts = {};
     const UPS_PRICES = buildUpsPrices(window.UPS_PRICE_ROWS || []);
@@ -1951,6 +2091,7 @@
     }
 
     function recDurationLabel(rec, duration) {
+      if (rec?.custom) return `预计后备 ${formatRuntime(rec.runtimeMinutes)}`;
       if (!rec?.estimatedDuration) return `${duration} 分钟推荐`;
       if (rec.durationMode === "cover") return `${duration} 分钟｜采用 ${rec.sourceDuration} 分钟配置`;
       return `${duration} 分钟｜按 ${rec.sourceDuration} 分钟配置估算`;
@@ -1981,6 +2122,26 @@
 
     function getBatteryProduct(model) {
       return BATTERY_PRODUCTS[normalizeBatteryModel(model)];
+    }
+
+    function allBatteryProducts() {
+      const rows = window.BATTERY_PRODUCT_ROWS || [];
+      return rows.map(row => ({
+        model: row[0],
+        series: row[1],
+        blockV: row[2],
+        capacityAh: row[3],
+        weightKg: row[4],
+        terminal: row[5]
+      }));
+    }
+
+    function selectedCustomBatteryProduct() {
+      return getBatteryProduct(selectedCustomBatteryModel) || allBatteryProducts()[0];
+    }
+
+    function batteryFamilyLabel(series) {
+      return ({ sp: "SP-b", spg: "SPG-b", gbt: "GBT", gfmd: "GFMD 2V" })[series] || series;
     }
 
     function buildUmBatteryData(rows) {
@@ -2049,6 +2210,47 @@
       return Math.exp(Math.log(lower.power) + slope * (Math.log(target) - Math.log(lower.minutes)));
     }
 
+    function estimateGbtRuntime(model, requiredW) {
+      const gbt = GBT_POWER_DATA.find(item => normalizeBatteryModel(item.model) === normalizeBatteryModel(model));
+      const points = Object.entries(gbt?.power || {})
+        .map(([minutes, power]) => ({ minutes: Number(minutes), power: Number(power) }))
+        .filter(point => Number.isFinite(point.minutes) && Number.isFinite(point.power) && point.power > 0)
+        .sort((a, b) => a.minutes - b.minutes);
+      if (!points.length || !Number.isFinite(requiredW) || requiredW <= 0) return undefined;
+
+      let lower = points[0];
+      let upper = points[1] || points[0];
+      for (let index = 0; index < points.length - 1; index += 1) {
+        const a = points[index];
+        const b = points[index + 1];
+        if (requiredW <= a.power && requiredW >= b.power) {
+          lower = a;
+          upper = b;
+          break;
+        }
+      }
+      if (requiredW > points[0].power && points.length >= 2) {
+        lower = points[0];
+        upper = points[1];
+      }
+      if (requiredW < points[points.length - 1].power && points.length >= 2) {
+        lower = points[points.length - 2];
+        upper = points[points.length - 1];
+      }
+
+      const slope = (Math.log(upper.minutes) - Math.log(lower.minutes)) / (Math.log(upper.power) - Math.log(lower.power));
+      const minutes = Math.exp(Math.log(lower.minutes) + slope * (Math.log(requiredW) - Math.log(lower.power)));
+      return Math.max(1, Math.min(720, minutes));
+    }
+
+    function formatRuntime(minutes) {
+      if (!Number.isFinite(minutes) || minutes <= 0) return "-";
+      if (minutes < 60) return `${formatNumber(minutes, 0)} min`;
+      const hours = Math.floor(minutes / 60);
+      const rest = Math.round(minutes % 60);
+      return rest ? `${hours}小时${rest}分钟` : `${hours}小时`;
+    }
+
     function modelKva(model) {
       const match = model.match(/-(\d{4})/);
       if (!match) return 0;
@@ -2096,6 +2298,7 @@
 
     function getBatteryQty(rec) {
       if (!rec) return 0;
+      if (rec.totalQty) return Number(rec.totalQty);
       if (rec.cells && rec.strings) return rec.cells * rec.strings;
       const qty = parseQty(rec.qty);
       return qty.cells * qty.strings;
@@ -2114,7 +2317,7 @@
         "蓄电池",
         qty,
         price,
-        `${rec.qty}${multiplier > 1 ? ` × ${multiplier}台 UPS` : ""}；${product?.blockV || rec.blockV || 12}V / ${product?.capacityAh || rec.capacityAh || "-"}Ah${rec.estimatedDuration ? `；${recDurationLabel(rec, rec.targetDuration || document.querySelector("#duration").value)}` : ""}`,
+        `${rec.qty}${multiplier > 1 ? ` × ${multiplier}台 UPS` : ""}；${product?.blockV || rec.blockV || 12}V / ${product?.capacityAh || rec.capacityAh || "-"}Ah${rec.estimatedDuration ? `；${recDurationLabel(rec, rec.targetDuration || currentDurationValue())}` : ""}`,
         rec.priceSource || priceInfo?.source || ""
       );
     }
@@ -2282,6 +2485,165 @@
       });
     }
 
+    function initBatteryPicker() {
+      const modal = document.querySelector("#batteryPickerModal");
+      const openButton = document.querySelector("#openBatteryPicker");
+      const closeButton = document.querySelector("#closeBatteryPicker");
+      const family = document.querySelector("#batteryPickerFamily");
+
+      function openModal() {
+        const selectedFamily = selectedCustomBatteryProduct()?.series || currentBatterySeriesValue();
+        family.value = selectedFamily === "spg" ? "spg" : selectedFamily;
+        renderBatteryPickerList();
+        modal.hidden = false;
+        modal.setAttribute("aria-hidden", "false");
+        family.focus();
+      }
+
+      function closeModal() {
+        modal.hidden = true;
+        modal.setAttribute("aria-hidden", "true");
+        openButton.focus();
+      }
+
+      document.querySelector("#customBatteryEnabled").addEventListener("change", () => {
+        if (customBatteryEnabled()) {
+          syncCustomBatteryDefaults();
+          syncPrimaryBatteryControlsLock(true);
+        } else {
+          syncPrimaryBatteryControlsLock(false);
+          syncCustomBatteryDefaults();
+        }
+        calculate();
+      });
+      ["customBatteryCells", "customBatteryStrings"].forEach(id => {
+        document.querySelector(`#${id}`).addEventListener("input", calculate);
+      });
+      openButton.addEventListener("click", openModal);
+      closeButton.addEventListener("click", closeModal);
+      family.addEventListener("change", renderBatteryPickerList);
+      modal.addEventListener("click", event => {
+        if (event.target === modal) closeModal();
+      });
+      document.addEventListener("keydown", event => {
+        if (event.key === "Escape" && !modal.hidden) closeModal();
+      });
+      renderBatteryPickerList();
+    }
+
+    function renderBatteryPickerList() {
+      const family = document.querySelector("#batteryPickerFamily").value;
+      const products = allBatteryProducts().filter(item => item.series === family);
+      document.querySelector("#batteryPickerList").innerHTML = products.map(product => `
+        <button class="battery-picker-item" type="button" data-model="${product.model}">
+          <strong>${product.model}</strong>
+          <small>${batteryFamilyLabel(product.series)}｜${product.blockV}V / ${product.capacityAh}Ah${product.weightKg ? `｜约 ${formatNumber(product.weightKg, 1)}kg` : ""}</small>
+        </button>
+      `).join("");
+      document.querySelectorAll(".battery-picker-item").forEach(button => {
+        button.addEventListener("click", () => {
+          selectedCustomBatteryModel = button.dataset.model;
+          document.querySelector("#batteryPickerModal").hidden = true;
+          document.querySelector("#batteryPickerModal").setAttribute("aria-hidden", "true");
+          syncCustomBatteryDefaults(false);
+          calculate();
+          document.querySelector("#openBatteryPicker").focus();
+        });
+      });
+    }
+
+    function customBatteryEnabled() {
+      return document.querySelector("#customBatteryEnabled")?.checked || false;
+    }
+
+    function currentBatterySeriesValue() {
+      return document.querySelector("#batterySeries").value || lockedBatterySeriesValue || "sp";
+    }
+
+    function currentDurationValue() {
+      return document.querySelector("#duration").value || lockedDurationValue || "15";
+    }
+
+    function syncPrimaryBatteryControlsLock(locked) {
+      const series = document.querySelector("#batterySeries");
+      const duration = document.querySelector("#duration");
+      if (locked) {
+        if (series.value) lockedBatterySeriesValue = series.value;
+        if (duration.value) lockedDurationValue = duration.value;
+        series.value = "";
+        duration.value = "";
+        series.disabled = true;
+        duration.disabled = true;
+        return;
+      }
+      series.disabled = false;
+      duration.disabled = false;
+      series.value = lockedBatterySeriesValue || "sp";
+      duration.value = lockedDurationValue || "15";
+    }
+
+    function syncCustomBatteryDefaults(fillEmpty = true) {
+      const fields = document.querySelector("#customBatteryFields");
+      fields.hidden = !customBatteryEnabled();
+      const defaultRec = isUmSelected() ? getUmBatteryRec(getUmSelection()) : getDurationRec(getSelectedRow()?.recommendations?.[currentBatterySeriesValue()] || {}, currentDurationValue());
+      if (!selectedCustomBatteryModel && defaultRec?.battery) selectedCustomBatteryModel = defaultRec.battery;
+      if (!selectedCustomBatteryModel) {
+        const family = currentBatterySeriesValue();
+        selectedCustomBatteryModel = allBatteryProducts().find(item => item.series === family)?.model || allBatteryProducts()[0]?.model || "";
+      }
+      const product = selectedCustomBatteryProduct();
+      const defaultQty = recQtyParts(defaultRec);
+      if (fillEmpty && !document.querySelector("#customBatteryCells").value) document.querySelector("#customBatteryCells").value = defaultQty.cells || (product?.blockV === 2 ? 192 : 40);
+      if (fillEmpty && !document.querySelector("#customBatteryStrings").value) document.querySelector("#customBatteryStrings").value = defaultQty.strings || 1;
+      document.querySelector("#customBatterySelected").textContent = product?.model || "未选择电池";
+      document.querySelector("#customBatteryMeta").textContent = product ? `${batteryFamilyLabel(product.series)}｜${product.blockV}V / ${product.capacityAh}Ah` : "点击选择电池型号";
+    }
+
+    function getCustomBatteryRec(loadPowerW, efficiency, defaultRec) {
+      if (!customBatteryEnabled()) return undefined;
+      syncCustomBatteryDefaults(false);
+      const product = selectedCustomBatteryProduct();
+      if (!product) return undefined;
+
+      const cells = Math.max(1, Math.floor(Number(document.querySelector("#customBatteryCells").value || recQtyParts(defaultRec).cells || 1)));
+      const strings = Math.max(1, Math.floor(Number(document.querySelector("#customBatteryStrings").value || recQtyParts(defaultRec).strings || 1)));
+      const effectiveTotal = cells * strings;
+      const cellPerBlock = product.blockV / 2;
+      const requiredW = loadPowerW / Math.max(1, cells * cellPerBlock * efficiency * strings);
+      const currentA = loadPowerW / Math.max(1, cells * 1.75 * cellPerBlock * efficiency * strings);
+      const priceInfo = getBatteryPrice(product.model);
+      const gbtRuntime = product.series === "gbt" ? estimateGbtRuntime(product.model, requiredW) : undefined;
+      const nominalRuntime = product.series === "gbt" ? undefined : (product.capacityAh * product.blockV * cells * strings * efficiency / Math.max(1, loadPowerW) * 60);
+      const runtimeMinutes = gbtRuntime || nominalRuntime;
+      const runtimeNote = product.series === "gbt"
+        ? `客户指定 ${product.model}，${strings}组×${cells}节，共 ${effectiveTotal} 支，按 GBT 恒功率曲线反算预计后备 ${formatRuntime(runtimeMinutes)}；报价前请按厂家放电表复核。`
+        : `客户指定 ${product.model}，${strings}组×${cells}节，共 ${effectiveTotal} 支，当前按标称容量法粗估预计后备 ${formatRuntime(runtimeMinutes)}；SP/GFMD 高倍率放电需按厂家放电表复核。`;
+
+      document.querySelector("#customBatteryRuntime").value = formatRuntime(runtimeMinutes);
+      document.querySelector("#customBatteryNote").textContent = runtimeNote;
+
+      return {
+        battery: product.model,
+        qty: recQtyText({ blockV: product.blockV }, strings, cells),
+        totalQty: effectiveTotal,
+        current: `${formatNumber(currentA, 1)}A`,
+        cells,
+        strings,
+        currentA,
+        blockV: product.blockV,
+        capacityAh: product.capacityAh,
+        weightKg: product.weightKg,
+        terminal: product.terminal || "",
+        code: priceInfo?.code || "",
+        price: priceInfo?.price || 0,
+        priceSource: priceInfo?.source || "",
+        requiredW,
+        runtimeMinutes,
+        custom: true,
+        durationNote: runtimeNote
+      };
+    }
+
     async function verifyAuthPhone() {
       const phone = normalizeAuthPhone(document.querySelector("#authPhone").value);
       if (!phone) {
@@ -2358,6 +2720,7 @@
     function init() {
       initAuth();
       initQrModal();
+      initBatteryPicker();
       const series = document.querySelector("#series");
       series.innerHTML = Object.entries(DATA).map(([key, value]) => `<option value="${key}">${value.name}</option>`).join("");
       series.addEventListener("change", populateUps);
@@ -2426,15 +2789,17 @@
       }
 
       const row = getSelectedRow();
-      const batterySeries = document.querySelector("#batterySeries").value;
-      const duration = document.querySelector("#duration").value;
+      const batterySeries = currentBatterySeriesValue();
+      const duration = currentDurationValue();
       const loadRate = Number(document.querySelector("#loadRate").value || 100) / 100;
       const efficiency = Number(document.querySelector("#efficiency").value || 0.92);
       const units = totalUpsUnits();
       const recSet = row.recommendations[batterySeries] || {};
-      const rec = getDurationRec(recSet, duration);
+      const recommendedRec = getDurationRec(recSet, duration);
       const notes = [];
       const loadPowerW = row.kva * 1000 * row.pf * loadRate;
+      const customRec = getCustomBatteryRec(loadPowerW, efficiency, recommendedRec);
+      const rec = customRec || recommendedRec;
       const upsLine = quoteLine(row.code, row.model, "UPS 主机", units, row.price, `${row.desc}；${topologyText()}`, row.priceSource);
       const batteryLine = getBatteryPriceLine(rec, units);
       setPriceSummary(upsLine, batteryLine);
@@ -2443,6 +2808,7 @@
         lines: [upsLine, batteryLine].filter(Boolean),
         notes: []
       };
+      document.querySelector("#recBatteryLabel").textContent = customRec ? "指定电池" : "推荐电池";
 
       if (!rec) {
         document.querySelector("#recBattery").textContent = "内置电池或未配置";
@@ -2454,24 +2820,27 @@
         document.querySelector("#powerNeed").textContent = "-";
       } else {
         const qty = parseQty(rec.qty);
-        const cellCount = qty.cells * 6;
+        const blockV = rec.blockV || getBatteryProduct(rec.battery)?.blockV || 12;
+        const cellPerBlock = blockV / 2;
+        const equivalent12vCells = blockV === 12 ? qty.cells : Math.ceil(qty.cells / 6);
+        const cellCount = qty.cells * cellPerBlock;
         const requiredW = loadPowerW / Math.max(1, cellCount * efficiency * qty.strings);
-        const calcCurrent = loadPowerW / Math.max(1, qty.cells * 1.75 * 6 * efficiency * qty.strings);
+        const calcCurrent = loadPowerW / Math.max(1, qty.cells * 1.75 * cellPerBlock * efficiency * qty.strings);
         document.querySelector("#recBattery").textContent = rec.battery;
         document.querySelector("#recDuration").textContent = recDurationLabel(rec, duration);
         document.querySelector("#recQty").textContent = units > 1 ? `${rec.qty} / 台，合计 × ${units}` : rec.qty;
-        document.querySelector("#dcVoltage").textContent = qty.cells ? `${qty.cells * 12}V DC，${qty.strings} 组` : "-";
+        document.querySelector("#dcVoltage").textContent = qty.cells ? `${qty.cells * blockV}V DC，${qty.strings} 组` : "-";
         document.querySelector("#recCurrent").textContent = rec.current;
-        document.querySelector("#switchLevel").textContent = `开关电压等级：${switchVoltage(qty.cells)}`;
+        document.querySelector("#switchLevel").textContent = `开关电压等级：${switchVoltage(equivalent12vCells)}`;
         document.querySelector("#powerNeed").textContent = `${formatNumber(requiredW, 1)} W/cell`;
         renderCalculationProcess([
           `负载功率 PL = ${row.kva}kVA × 1000 × 功率因数 ${row.pf} × 负载率 ${formatNumber(loadRate * 100, 0)}% = ${formatNumber(loadPowerW, 0)}W。`,
           ...(rec.durationNote ? [rec.durationNote] : []),
           `项目拓扑：${topologyText()}；电池按每台 UPS 独立配置，报价数量按 ${units} 台汇总。`,
-          `单组 ${qty.cells} 节 12V 电池，每节按 6 个 2V 单格计算；总参与单格数 = ${qty.cells} × 6 × ${qty.strings}组 = ${cellCount * qty.strings}。`,
-          `恒功率需求 W/cell = PL / (节数 × 6 × η × 组数) = ${formatNumber(loadPowerW, 0)} / (${qty.cells} × 6 × ${efficiency} × ${qty.strings}) = ${formatNumber(requiredW, 1)}W/cell。`,
-          `最大放电电流 I = PL / (节数 × 1.75 × 6 × η × 组数) = ${formatNumber(calcCurrent, 1)}A；配置表开关参考为 ${rec.current}。`,
-          `电池开关电压等级按单组节数 ${qty.cells} 节选择：${switchVoltage(qty.cells)}。`
+          `单组 ${qty.cells} 节 ${blockV}V 电池，每节按 ${cellPerBlock} 个 2V 单格计算；总参与单格数 = ${qty.cells} × ${cellPerBlock} × ${qty.strings}组 = ${cellCount * qty.strings}。`,
+          `恒功率需求 W/cell = PL / (节数 × 单格数 × η × 组数) = ${formatNumber(loadPowerW, 0)} / (${qty.cells} × ${cellPerBlock} × ${efficiency} × ${qty.strings}) = ${formatNumber(requiredW, 1)}W/cell。`,
+          `最大放电电流 I = PL / (节数 × 1.75 × 单格数 × η × 组数) = ${formatNumber(calcCurrent, 1)}A；配置表/指定配置开关参考为 ${rec.current}。`,
+          `电池开关电压等级按单组等效 12V 节数 ${equivalent12vCells} 选择：${switchVoltage(equivalent12vCells)}。`
         ]);
       }
 
@@ -2488,6 +2857,7 @@
       if (row.note) notes.push({ type: "warn", text: row.note });
       if (row.battery.includes("-")) notes.push({ type: "note", text: `该机型电池节数范围：${row.battery}，现场可根据功率降额规则调整。` });
       if (!rec) notes.push({ type: "warn", text: "该型号为标机或内置电池，配置表未给出外置电池推荐。若需要外接长延时，请切换到对应长机型号或使用手动核算。" });
+      if (customRec) notes.push({ type: "warn", text: "当前已启用客户指定电池，推荐表仅作对照，报价和监控仪按指定型号/数量计算。" });
       if (rec?.durationNote) notes.push({ type: "warn", text: rec.durationNote });
       if (!row.price) notes.push({ type: "warn", text: `${row.model} 未在当前价格表匹配到价格，导出报价中会保留为待补价。` });
       if (rec && !batteryLine?.price) notes.push({ type: "warn", text: `${rec.battery} 未在当前电池价格表匹配到价格，导出报价中会保留为待补价。` });
@@ -2499,7 +2869,7 @@
       document.querySelector("#notes").innerHTML = notes.map(item => `<div class="note ${item.type === "warn" ? "warn" : ""}">${item.text}</div>`).join("");
       renderSalesAdvice(standardAdviceForRow(row, rec));
       currentQuote.notes = [...notes.map(item => item.text), ...currentCalculationSteps, ...currentSalesAdvice];
-      renderOptions(row, batterySeries);
+      renderOptions(row, batterySeries, customRec);
       syncManual(row, rec);
       syncMonitor(row, rec, loadPowerW, efficiency);
       renderQuoteDiscounts();
@@ -2649,7 +3019,7 @@
     }
 
     function getUmBatterySeriesKey() {
-      const series = document.querySelector("#batterySeries").value;
+      const series = currentBatterySeriesValue();
       if (series === "gfmd") return "gfmd";
       if (series === "gbt") return "gbt";
       return "sp";
@@ -2735,7 +3105,7 @@
     }
 
     function getUmBatteryRec(selection) {
-      const duration = document.querySelector("#duration").value;
+      const duration = currentDurationValue();
       return getDurationRec(getUmBatterySet(selection), duration);
     }
 
@@ -2766,13 +3136,15 @@
 
     function calculateUm() {
       const selection = getUmSelection();
-      const duration = document.querySelector("#duration").value;
-      const batterySeries = document.querySelector("#batterySeries").value;
-      const rec = getUmBatteryRec(selection);
+      const duration = currentDurationValue();
+      const batterySeries = currentBatterySeriesValue();
       const loadRate = Number(document.querySelector("#loadRate").value || 100) / 100;
       const efficiency = Number(document.querySelector("#efficiency").value || 0.92);
       const units = totalUpsUnits();
       const loadPowerW = selection.capacity * 1000 * loadRate;
+      const recommendedRec = getUmBatteryRec(selection);
+      const customRec = getCustomBatteryRec(loadPowerW, efficiency, recommendedRec);
+      const rec = customRec || recommendedRec;
       const accessoryLines = getUmAccessoryLines();
       const allLines = [...selection.lines, ...accessoryLines].map(line => ({ ...line, qty: line.qty * units, desc: `${line.desc}${units > 1 ? `；${topologyText()}` : ""}` }));
       const accessoryTotal = accessoryLines.reduce((sum, line) => sum + line.price * line.qty * units, 0);
@@ -2786,6 +3158,7 @@
         notes: []
       };
 
+      document.querySelector("#recBatteryLabel").textContent = customRec ? "指定电池" : "推荐电池";
       document.querySelector("#umCapacity").value = `${selection.capacity} kVA`;
       document.querySelector("#recBattery").textContent = rec ? rec.battery : "配置表无推荐";
       document.querySelector("#recDuration").textContent = rec
@@ -2842,6 +3215,7 @@
         { type: "note", text: "UM 为模块化 UPS：页面按功率模块容量 × 模块数量得到整机容量，再匹配 UM 蓄电池配置表。" },
         { type: "note", text: `当前配置：${selection.modeText}，${selection.module.kva}kVA 模块 × ${selection.qty}，输出容量 ${selection.capacity}kVA。` },
         { type: "note", text: `项目拓扑：${topologyText()}；当前报价按 ${units} 台 UPS 汇总，蓄电池按每台 UPS 独立配置。` },
+        ...(customRec ? [{ type: "warn", text: "当前已启用客户指定电池，UM 配置表仅作对照，报价和监控仪按指定型号/数量计算。" }] : []),
         ...(parallelUnits() > 1 ? [{ type: "warn", text: "并机项目需按现场距离配置并机线缆；UM/UE 并机线可选 5m/10m/15m/20m，数量按并机台数成环复核。" }] : []),
         { type: rec?.durationNote ? "warn" : "note", text: rec ? `电池匹配：${rec.battery}，${rec.qty}${rec.weightKg ? `，单体重量约 ${formatNumber(rec.weightKg, 1)}kg` : ""}${rec.durationNote ? `；${rec.durationNote}` : ""}。` : "当前容量/时长未找到推荐行，可切换后备时间或用手动核算。" },
         { type: selection.module.lithium ? "warn" : "note", text: selection.module.lithium ? "当前选择的是锂电版功率模块/机柜；本页 UM 蓄电池配置表为铅酸电池推荐，锂电方案需按锂电系统资料单独配置。" : "当前 UM 电池推荐按铅酸电池配置表匹配。" },
@@ -2853,24 +3227,24 @@
       document.querySelector("#notes").innerHTML = notes.map(item => `<div class="note ${item.type === "warn" ? "warn" : ""}">${item.text}</div>`).join("");
       renderSalesAdvice(umSalesAdvice(selection, rec));
       currentQuote.notes = [...notes.map(item => item.text), ...currentCalculationSteps, ...currentSalesAdvice];
-      renderUmOptions(selection);
+      renderUmOptions(selection, customRec);
       syncUmManual(selection, loadPowerW, efficiency, rec);
       syncUmMonitor(selection, loadPowerW, efficiency, rec);
       renderQuoteDiscounts();
     }
 
-    function renderUmOptions(selection) {
+    function renderUmOptions(selection, customRec) {
       const batterySet = getUmBatterySet(selection);
       const units = totalUpsUnits();
-      const duration = document.querySelector("#duration").value;
+      const duration = currentDurationValue();
       document.querySelector("#optionsBody").innerHTML = [duration].map(duration => {
-        const rec = getDurationRec(batterySet, duration);
+        const rec = customRec || getDurationRec(batterySet, duration);
         const batteryLine = getBatteryPriceLine(rec, units);
         return `<tr>
-          <td><span class="pill">${duration} min</span></td>
+          <td><span class="pill">${customRec ? "指定电池" : `${duration} min`}</span></td>
           ${rec ? `
             <td>${rec.battery}</td>
-            <td>${rec.qty}${rec.estimatedDuration ? `<br><span class="muted">${rec.sourceDuration} min ${rec.durationMode === "cover" ? "覆盖" : "估算"}</span>` : ""}</td>
+            <td>${rec.qty}${rec.custom ? `<br><span class="muted">预计 ${formatRuntime(rec.runtimeMinutes)}</span>` : ""}${rec.estimatedDuration ? `<br><span class="muted">${rec.sourceDuration} min ${rec.durationMode === "cover" ? "覆盖" : "估算"}</span>` : ""}</td>
             <td>${rec.current}</td>
             <td>${rec.cells}</td>
             <td>${dcTextForRec(rec)}</td>
@@ -2909,22 +3283,24 @@
       monitorCalc();
     }
 
-    function renderOptions(row, batterySeries) {
+    function renderOptions(row, batterySeries, customRec) {
       const recSet = row.recommendations[batterySeries] || {};
       const units = totalUpsUnits();
-      const duration = document.querySelector("#duration").value;
+      const duration = currentDurationValue();
       document.querySelector("#optionsBody").innerHTML = [duration].map(duration => {
-        const rec = getDurationRec(recSet, duration);
+        const rec = customRec || getDurationRec(recSet, duration);
         if (!rec) return `<tr><td>${duration} min</td><td colspan="7" class="muted">配置表无外置电池推荐</td></tr>`;
         const qty = parseQty(rec.qty);
         const batteryLine = getBatteryPriceLine(rec, units);
+        const blockV = rec.blockV || getBatteryProduct(rec.battery)?.blockV || 12;
+        const equivalent12vCells = blockV === 12 ? qty.cells : Math.ceil(qty.cells / 6);
         return `<tr>
-          <td><span class="pill">${duration} min</span></td>
+          <td><span class="pill">${customRec ? "指定电池" : `${duration} min`}</span></td>
           <td>${rec.battery}</td>
-          <td>${rec.qty}${rec.estimatedDuration ? `<br><span class="muted">${rec.sourceDuration} min ${rec.durationMode === "cover" ? "覆盖" : "估算"}</span>` : ""}</td>
+          <td>${rec.qty}${rec.custom ? `<br><span class="muted">预计 ${formatRuntime(rec.runtimeMinutes)}</span>` : ""}${rec.estimatedDuration ? `<br><span class="muted">${rec.sourceDuration} min ${rec.durationMode === "cover" ? "覆盖" : "估算"}</span>` : ""}</td>
           <td>${rec.current}</td>
           <td>${qty.cells || "-"}</td>
-          <td>${qty.cells ? qty.cells * 12 + "V / " + switchVoltage(qty.cells) : "-"}</td>
+          <td>${qty.cells ? qty.cells * blockV + "V / " + switchVoltage(equivalent12vCells) : "-"}</td>
           <td>${formatMoney(batteryLine?.price || 0)}</td>
           <td>${formatMoney(batteryLine?.amount || 0)}</td>
         </tr>`;
@@ -2933,11 +3309,13 @@
 
     function syncManual(row, rec) {
       const qty = rec ? parseQty(rec.qty) : { cells: Number(String(row.battery).match(/\d+/)?.[0] || 20), strings: 1 };
+      const blockV = rec?.blockV || getBatteryProduct(rec?.battery || "")?.blockV || 12;
       document.querySelector("#manualVa").value = Math.round(row.kva * 1000);
       document.querySelector("#manualPf").value = row.pf;
       document.querySelector("#manualCells").value = qty.cells || 20;
       document.querySelector("#manualStrings").value = qty.strings || 1;
       document.querySelector("#manualEff").value = document.querySelector("#efficiency").value;
+      document.querySelector("#manualBlockV").value = blockV;
       manualCalc();
     }
 
@@ -2945,13 +3323,15 @@
       const qty = rec ? parseQty(rec.qty) : { cells: Number(String(row.battery).match(/\d+/)?.[0] || 20), strings: 1 };
       const cells = qty.cells || 20;
       const strings = (qty.strings || 1) * totalUpsUnits();
-      const current = loadPowerW / Math.max(1, cells * 10.5 * efficiency);
+      const blockV = rec?.blockV || getBatteryProduct(rec?.battery || "")?.blockV || 12;
+      const current = loadPowerW / Math.max(1, cells * (blockV === 12 ? 10.5 : 1.75) * efficiency);
       const branchCurrent = (qty.strings || 1) >= 2 ? current / Math.max(1, (qty.strings || 1) - 1) : current;
       const terminalInfo = inferTerminalFromBattery(rec?.battery || "");
       currentMonitorBatteryModel = rec?.battery || "";
       currentMonitorTerminalNote = terminalInfo.note;
       document.querySelector("#monitorCells").value = cells;
       document.querySelector("#monitorStrings").value = strings;
+      document.querySelector("#monitorBlockV").value = blockV;
       document.querySelector("#monitorCurrent").value = Math.ceil(branchCurrent);
       document.querySelector("#monitorTerminal").value = terminalInfo.terminal;
       monitorCalc();
@@ -3104,7 +3484,11 @@
     }
 
     function currentDurationText() {
-      return `${document.querySelector("#duration").value} min`;
+      if (customBatteryEnabled()) {
+        const runtime = document.querySelector("#customBatteryRuntime")?.value || "-";
+        return `指定电池｜预计 ${runtime}`;
+      }
+      return `${currentDurationValue()} min`;
     }
 
     function getCurrentQuoteLines() {

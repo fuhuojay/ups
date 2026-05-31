@@ -22,6 +22,38 @@
 
 这是纯静态页面，GitHub Pages 可直接从仓库根目录发布 `index.html`。
 
+## 访问统计
+
+页面内置轻量统计模块，默认记录页面访问、配置变更、手机号授权结果、客户指定电池、加入项目清单、导出 Excel、点击微信二维码等事件。
+
+统计不会记录明文手机号；授权用户只会上报手机号 SHA-256 哈希，便于后续按授权客户做行为分析。
+
+推荐用 Google Sheet 做统计收件箱：
+
+1. 新建一个 Google Sheet，例如“UPS 配置工具访问统计”
+2. 打开“扩展程序 > Apps Script”
+3. 把 `analytics/google-apps-script.gs` 的内容复制进去并保存
+4. 在 Apps Script 中运行一次 `setupAnalyticsWorkbook`，授权后会自动生成“访问事件”和“客户分析”两个工作表
+5. 点击“部署 > 新建部署 > Web 应用”
+6. 执行身份选择“我”，访问权限选择“任何人”
+7. 复制 Web App URL，填到项目根目录 `analytics-config.js` 的 `endpoint`
+
+配置示例：
+
+```html
+window.UPS_ANALYTICS_CONFIG = {
+  enabled: true,
+  endpoint: "https://你的统计接口地址",
+  mode: "no-cors",
+  debug: false,
+  sampleRate: 1
+};
+```
+
+如果 `endpoint` 为空，事件只会暂存在当前浏览器的 `localStorage` 队列 `ups-analytics-queue` 中，不会向外发送，也不影响报价工具使用。
+
+上线后查看统计：打开对应 Google Sheet，看“访问事件”明细和“客户分析”汇总。高意向客户可以优先看 `auth_success`、`quote_exported`、`wechat_qr_opened` 这些事件。
+
 ## 授权手机号
 
 授权名单在 `authorized-phones.js` 中维护，文件只保存手机号哈希。

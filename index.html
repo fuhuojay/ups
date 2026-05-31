@@ -1695,6 +1695,16 @@
   <script src="battery-products-data.js"></script>
   <script src="um-battery-data.js"></script>
   <script src="gbt-battery-data.js"></script>
+  <script src="analytics-config.js"></script>
+  <script>
+    window.UPS_ANALYTICS_CONFIG = window.UPS_ANALYTICS_CONFIG || {
+      enabled: true,
+      endpoint: "",
+      mode: "cors",
+      debug: false,
+      sampleRate: 1
+    };
+  </script>
   <script>
     const durations = ["15", "30", "45", "60", "120", "180", "240", "300", "360"];
     const hallSensors = [
@@ -1742,7 +1752,11 @@
     let selectedCustomBatteryModel = "";
     let lockedBatterySeriesValue = "sp";
     let lockedDurationValue = "15";
+    let analyticsConfigTimer = 0;
     const AUTH_STORAGE_KEY = "ups-price-auth-hash";
+    const ANALYTICS_QUEUE_KEY = "ups-analytics-queue";
+    const ANALYTICS_CLIENT_KEY = "ups-analytics-client";
+    const ANALYTICS_SESSION_KEY = "ups-analytics-session";
     const quoteDiscounts = {};
     const UPS_PRICES = buildUpsPrices(window.UPS_PRICE_ROWS || []);
     const BATTERY_PRICES = buildBatteryPrices(window.BATTERY_PRICE_ROWS || []);
@@ -2268,6 +2282,197 @@
       return new Intl.NumberFormat("zh-CN", { maximumFractionDigits: digits }).format(value);
     }
 
+    function analyticsConfig() {
+      const config = window.UPS_ANALYTICS_CONFIG || {};
+      return {
+        enabled: config.enabled !== false,
+        endpoint: String(config.endpoint || "").trim(),
+        mode: config.mode === "no-cors" ? "no-cors" : "cors",
+        debug: Boolean(config.debug),
+        sampleRate: Math.max(0, Math.min(1, Number(config.sampleRate ?? 1) || 0)),
+        maxQueue: Math.max(20, Number(config.maxQueue || 120)),
+        batchSize: Math.max(1, Number(config.batchSize || 10))
+      };
+    }
+
+    function storageGet(key, fallback = "") {
+      try {
+        return localStorage.getItem(key) || fallback;
+      } catch (error) {
+        return fallback;
+      }
+    }
+
+    function storageSet(key, value) {
+      try {
+        localStorage.setItem(key, value);
+      } catch (error) {
+        if (analyticsConfig().debug) console.warn("analytics storage failed", error);
+      }
+    }
+
+    function analyticsId() {
+      if (crypto.randomUUID) return crypto.randomUUID();
+      return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    }
+
+    function analyticsClientId() {
+      let id = storageGet(ANALYTICS_CLIENT_KEY);
+      if (!id) {
+        id = analyticsId();
+        storageSet(ANALYTICS_CLIENT_KEY, id);
+      }
+      return id;
+    }
+
+    function analyticsSessionId() {
+      let id = "";
+      try {
+        id = sessionStorage.getItem(ANALYTICS_SESSION_KEY) || "";
+        if (!id) {
+          id = analyticsId();
+          sessionStorage.setItem(ANALYTICS_SESSION_KEY, id);
+        }
+      } catch (error) {
+        id = analyticsClientId();
+      }
+      return id;
+    }
+
+    function readAnalyticsQueue() {
+      try {
+        const rows = JSON.parse(localStorage.getItem(ANALYTICS_QUEUE_KEY) || "[]");
+        return Array.isArray(rows) ? rows : [];
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function writeAnalyticsQueue(rows) {
+      const config = analyticsConfig();
+      storageSet(ANALYTICS_QUEUE_KEY, JSON.stringify(rows.slice(-config.maxQueue)));
+    }
+
+    function sanitizedAnalyticsPayload(payload) {
+      return JSON.parse(JSON.stringify(payload || {}, (_key, value) => {
+        if (value === undefined || typeof value === "function") return undefined;
+        if (typeof value === "number" && !Number.isFinite(value)) return undefined;
+        return value;
+      }));
+    }
+
+    function currentAnalyticsContext() {
+      const customProduct = selectedCustomBatteryProduct?.();
+      const base = {
+        series: document.querySelector("#series")?.value || "",
+        upsModel: document.querySelector("#ups")?.value || "",
+        batterySeries: customBatteryEnabled() ? "" : currentBatterySeriesValue(),
+        durationMin: customBatteryEnabled() ? "" : currentDurationValue(),
+        loadRate: Number(document.querySelector("#loadRate")?.value || 0),
+        efficiency: Number(document.querySelector("#efficiency")?.value || 0),
+        systemQty: systemQty(),
+        parallelUnits: parallelUnits(),
+        totalUpsUnits: totalUpsUnits(),
+        includeMonitor: monitorIncluded(),
+        customBatteryEnabled: customBatteryEnabled(),
+        priceAuthorized: canViewPrices(),
+        projectItemCount: projectItems.length,
+        workspaceTab: activeWorkspaceTab
+      };
+      if (isUmSelected()) {
+        const selection = getUmSelection();
+        base.upsModel = `${selection.modeText} ${selection.capacity}kVA`;
+        base.umMode = selection.mode;
+        base.umModuleKva = selection.module.kva;
+        base.umModuleQty = selection.qty;
+        base.umCapacityKva = selection.capacity;
+      }
+      if (customBatteryEnabled()) {
+        base.customBattery = {
+          model: customProduct?.model || "",
+          series: customProduct?.series || "",
+          blockV: customProduct?.blockV || "",
+          capacityAh: customProduct?.capacityAh || "",
+          cells: Number(document.querySelector("#customBatteryCells")?.value || 0),
+          strings: Number(document.querySelector("#customBatteryStrings")?.value || 0),
+          runtime: document.querySelector("#customBatteryRuntime")?.value || ""
+        };
+      }
+      return base;
+    }
+
+    async function flushAnalyticsQueue(useBeacon = false) {
+      const config = analyticsConfig();
+      if (!config.enabled || !config.endpoint) return;
+      const queue = readAnalyticsQueue();
+      if (!queue.length) return;
+      const events = queue.slice(0, config.batchSize);
+      const body = JSON.stringify({ source: "ups-config-static", events });
+      const removeSent = () => {
+        const sent = new Set(events.map(event => event.id));
+        writeAnalyticsQueue(readAnalyticsQueue().filter(event => !sent.has(event.id)));
+      };
+      if (useBeacon && navigator.sendBeacon) {
+        const ok = navigator.sendBeacon(config.endpoint, new Blob([body], { type: "text/plain;charset=UTF-8" }));
+        if (ok) removeSent();
+        return;
+      }
+      try {
+        const response = await fetch(config.endpoint, {
+          method: "POST",
+          mode: config.mode,
+          headers: { "Content-Type": "text/plain;charset=UTF-8" },
+          body,
+          keepalive: body.length < 60000
+        });
+        if (response.ok || response.type === "opaque") removeSent();
+      } catch (error) {
+        if (config.debug) console.warn("analytics upload failed", error);
+      }
+    }
+
+    function trackEvent(name, payload = {}, options = {}) {
+      const config = analyticsConfig();
+      if (!config.enabled || Math.random() > config.sampleRate) return;
+      const event = {
+        id: analyticsId(),
+        name,
+        timestamp: new Date().toISOString(),
+        clientId: analyticsClientId(),
+        sessionId: analyticsSessionId(),
+        authHash: storageGet(AUTH_STORAGE_KEY),
+        page: {
+          path: location.pathname,
+          query: location.search,
+          referrer: document.referrer || "",
+          title: document.title
+        },
+        device: {
+          language: navigator.language || "",
+          platform: navigator.platform || "",
+          viewport: `${window.innerWidth}x${window.innerHeight}`,
+          screen: `${screen.width}x${screen.height}`,
+          touch: navigator.maxTouchPoints > 0
+        },
+        payload: sanitizedAnalyticsPayload(payload)
+      };
+      writeAnalyticsQueue([...readAnalyticsQueue(), event]);
+      if (config.debug) console.log("analytics event", event);
+      if (options.immediate || readAnalyticsQueue().length >= config.batchSize) {
+        flushAnalyticsQueue(Boolean(options.beacon));
+      }
+    }
+
+    function scheduleConfigAnalytics(reason = "change") {
+      clearTimeout(analyticsConfigTimer);
+      analyticsConfigTimer = setTimeout(() => {
+        trackEvent("configuration_changed", { reason, config: currentAnalyticsContext() });
+      }, 900);
+    }
+
+    window.trackUpsQuoteEvent = trackEvent;
+    window.flushUpsQuoteAnalytics = flushAnalyticsQueue;
+
     function canViewPrices() {
       return isPriceAuthorized;
     }
@@ -2452,6 +2657,7 @@
         if (event.key === "Enter") verifyAuthPhone();
       });
       document.querySelector("#authLogout").addEventListener("click", () => {
+        trackEvent("auth_logout", {}, { immediate: true });
         localStorage.removeItem(AUTH_STORAGE_KEY);
         setAuthState(false);
         populateUps();
@@ -2466,6 +2672,7 @@
       function openModal() {
         modal.hidden = false;
         modal.setAttribute("aria-hidden", "false");
+        trackEvent("wechat_qr_opened", { location: "auth_panel" }, { immediate: true });
         closeButton.focus();
       }
 
@@ -2514,10 +2721,17 @@
           syncPrimaryBatteryControlsLock(false);
           syncCustomBatteryDefaults();
         }
+        trackEvent("custom_battery_toggled", {
+          enabled: customBatteryEnabled(),
+          config: currentAnalyticsContext()
+        });
         calculate();
       });
       ["customBatteryCells", "customBatteryStrings"].forEach(id => {
-        document.querySelector(`#${id}`).addEventListener("input", calculate);
+        document.querySelector(`#${id}`).addEventListener("input", () => {
+          calculate();
+          scheduleConfigAnalytics(id);
+        });
       });
       openButton.addEventListener("click", openModal);
       closeButton.addEventListener("click", closeModal);
@@ -2546,6 +2760,11 @@
           document.querySelector("#batteryPickerModal").hidden = true;
           document.querySelector("#batteryPickerModal").setAttribute("aria-hidden", "true");
           syncCustomBatteryDefaults(false);
+          trackEvent("custom_battery_selected", {
+            model: selectedCustomBatteryModel,
+            family: document.querySelector("#batteryPickerFamily").value,
+            config: currentAnalyticsContext()
+          }, { immediate: true });
           calculate();
           document.querySelector("#openBatteryPicker").focus();
         });
@@ -2654,10 +2873,12 @@
       if (authHashes().includes(hash)) {
         localStorage.setItem(AUTH_STORAGE_KEY, hash);
         setAuthState(true);
+        trackEvent("auth_success", { authHash: hash }, { immediate: true });
         populateUps();
       } else {
         localStorage.removeItem(AUTH_STORAGE_KEY);
         setAuthState(false, "手机号未授权：目录价将显示为 ****。如需使用完整功能，请联系开发者 Michael，对项目有建议请加微信，感谢您的反馈。");
+        trackEvent("auth_failed", {}, { immediate: true });
       }
     }
 
@@ -2705,6 +2926,7 @@
       };
       const heading = document.querySelector(".output-heading h2");
       if (heading) heading.textContent = titleMap[activeWorkspaceTab] || titleMap.config;
+      trackEvent("workspace_tab_changed", { tab: activeWorkspaceTab });
     }
 
     function renderCalculationProcess(steps) {
@@ -2762,6 +2984,16 @@
       manualCalc();
       monitorCalc();
       setWorkspaceTab(activeWorkspaceTab);
+      trackEvent("page_view", { config: currentAnalyticsContext() }, { immediate: true });
+      window.addEventListener("online", () => flushAnalyticsQueue());
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "hidden") {
+          trackEvent("page_hidden", { config: currentAnalyticsContext() }, { immediate: true, beacon: true });
+        }
+      });
+      window.addEventListener("beforeunload", () => {
+        trackEvent("page_unloaded", { config: currentAnalyticsContext() }, { immediate: true, beacon: true });
+      });
     }
 
     function populateUps() {
@@ -2873,6 +3105,7 @@
       syncManual(row, rec);
       syncMonitor(row, rec, loadPowerW, efficiency);
       renderQuoteDiscounts();
+      scheduleConfigAnalytics("standard_calculate");
     }
 
     function initUmSelectors() {
@@ -3231,6 +3464,7 @@
       syncUmManual(selection, loadPowerW, efficiency, rec);
       syncUmMonitor(selection, loadPowerW, efficiency, rec);
       renderQuoteDiscounts();
+      scheduleConfigAnalytics("um_calculate");
     }
 
     function renderUmOptions(selection, customRec) {
@@ -3526,10 +3760,18 @@
       projectItems.push(item);
       renderProjectItems();
       renderQuoteDiscounts();
+      trackEvent("project_item_added", {
+        label,
+        lineCount: item.lines.length,
+        config: currentAnalyticsContext()
+      }, { immediate: true });
       setWorkspaceTab("project");
     }
 
     function clearProjectItems() {
+      if (projectItems.length) {
+        trackEvent("project_items_cleared", { count: projectItems.length }, { immediate: true });
+      }
       projectItems = [];
       renderProjectItems();
       renderQuoteDiscounts();
@@ -3538,6 +3780,7 @@
     function handleProjectClick(event) {
       const button = event.target.closest("[data-project-delete]");
       if (!button) return;
+      trackEvent("project_item_deleted", { id: button.dataset.projectDelete }, { immediate: true });
       projectItems = projectItems.filter(item => item.id !== button.dataset.projectDelete);
       renderProjectItems();
       renderQuoteDiscounts();
@@ -3597,6 +3840,7 @@
       if (!input) return;
       quoteDiscounts[input.dataset.discountKey] = input.value;
       renderQuoteDiscounts();
+      trackEvent("discount_changed", { hasValue: input.value !== "", config: currentAnalyticsContext() });
     }
 
     function renderQuoteDiscounts() {
@@ -3901,6 +4145,14 @@
       link.click();
       link.remove();
       URL.revokeObjectURL(url);
+      trackEvent("quote_exported", {
+        title,
+        lineCount: lines.length,
+        projectItemCount: projectItems.length,
+        priceAuthorized: canViewPrices(),
+        categories: [...new Set(lines.map(line => line.category || line.name || ""))].filter(Boolean),
+        config: currentAnalyticsContext()
+      }, { immediate: true });
     }
 
     init();

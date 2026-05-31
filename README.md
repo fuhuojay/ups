@@ -26,7 +26,7 @@
 
 页面内置轻量统计模块，默认记录页面访问、配置变更、手机号授权结果、客户指定电池、加入项目清单、导出 Excel、点击微信二维码等事件。
 
-统计不会记录明文手机号；授权用户只会上报手机号 SHA-256 哈希，便于后续按授权客户做行为分析。
+统计不会记录明文手机号；授权用户只会上报手机号 SHA-256 哈希，便于后续按授权客户做行为分析。公网 IP 为客户当前网络出口 IP，可能是公司网关、运营商 NAT、代理或 VPN，不等同于客户个人设备的真实内网地址。
 
 推荐用 Google Sheet 做统计收件箱：
 
@@ -45,6 +45,8 @@ window.UPS_ANALYTICS_CONFIG = {
   enabled: true,
   endpoint: "https://你的统计接口地址",
   mode: "no-cors",
+  collectIp: true,
+  ipEndpoint: "https://api.ipify.org?format=json",
   debug: false,
   sampleRate: 1
 };

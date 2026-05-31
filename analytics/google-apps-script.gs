@@ -33,6 +33,10 @@ const EVENT_HEADERS = [
   "设备平台",
   "视窗尺寸",
   "触屏设备",
+  "访问日期",
+  "访问时间",
+  "访问时区",
+  "公网IP",
   "原始数据"
 ];
 
@@ -78,6 +82,8 @@ function setupAnalyticsWorkbook() {
     ["点击微信二维码次数", "=COUNTIF('" + EVENT_SHEET_NAME + "'!C:C,\"wechat_qr_opened\")"],
     ["客户指定电池次数", "=COUNTIF('" + EVENT_SHEET_NAME + "'!C:C,\"custom_battery_selected\")"]
   ]);
+  eventSheet.getRange("A:A").setNumberFormat("yyyy-mm-dd hh:mm:ss");
+  eventSheet.getRange("B:B").setNumberFormat("yyyy-mm-dd hh:mm:ss");
   reportSheet.getRange("D1").setValue("热门 UPS 型号");
   reportSheet.getRange("D2").setFormula("=QUERY('" + EVENT_SHEET_NAME + "'!J2:J,\"select J, count(J) where J is not null group by J order by count(J) desc label J 'UPS型号', count(J) '次数'\",0)");
   reportSheet.getRange("G1").setValue("热门电池系列");
@@ -99,9 +105,10 @@ function eventToRow_(event) {
   const customBattery = config.customBattery || {};
   const page = event.page || {};
   const device = event.device || {};
+  const eventDate = event.timestamp ? new Date(event.timestamp) : "";
   return [
     new Date(),
-    event.timestamp || "",
+    eventDate,
     event.name || "",
     event.clientId || "",
     event.sessionId || "",
@@ -131,6 +138,10 @@ function eventToRow_(event) {
     device.platform || "",
     device.viewport || "",
     boolText_(device.touch),
+    event.localDate || "",
+    event.localTime || "",
+    event.timeZone || "",
+    device.ip || "",
     JSON.stringify(event)
   ];
 }

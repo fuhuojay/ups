@@ -1701,6 +1701,8 @@
       enabled: true,
       endpoint: "",
       mode: "cors",
+      collectIp: false,
+      ipEndpoint: "",
       debug: false,
       sampleRate: 1
     };
@@ -1753,10 +1755,12 @@
     let lockedBatterySeriesValue = "sp";
     let lockedDurationValue = "15";
     let analyticsConfigTimer = 0;
+    let visitorIp = "";
     const AUTH_STORAGE_KEY = "ups-price-auth-hash";
     const ANALYTICS_QUEUE_KEY = "ups-analytics-queue";
     const ANALYTICS_CLIENT_KEY = "ups-analytics-client";
     const ANALYTICS_SESSION_KEY = "ups-analytics-session";
+    const ANALYTICS_IP_KEY = "ups-analytics-ip";
     const quoteDiscounts = {};
     const UPS_PRICES = buildUpsPrices(window.UPS_PRICE_ROWS || []);
     const BATTERY_PRICES = buildBatteryPrices(window.BATTERY_PRICE_ROWS || []);
@@ -2288,6 +2292,8 @@
         enabled: config.enabled !== false,
         endpoint: String(config.endpoint || "").trim(),
         mode: config.mode === "no-cors" ? "no-cors" : "cors",
+        collectIp: config.collectIp === true,
+        ipEndpoint: String(config.ipEndpoint || "").trim(),
         debug: Boolean(config.debug),
         sampleRate: Math.max(0, Math.min(1, Number(config.sampleRate ?? 1) || 0)),
         maxQueue: Math.max(20, Number(config.maxQueue || 120)),
@@ -2323,6 +2329,28 @@
         storageSet(ANALYTICS_CLIENT_KEY, id);
       }
       return id;
+    }
+
+    async function initVisitorIp() {
+      const config = analyticsConfig();
+      visitorIp = storageGet(ANALYTICS_IP_KEY);
+      if (!config.collectIp || !config.ipEndpoint) return;
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 1500);
+      try {
+        const response = await fetch(config.ipEndpoint, { cache: "no-store", signal: controller.signal });
+        if (!response.ok) return;
+        const data = await response.json();
+        const ip = String(data.ip || data.query || "").trim();
+        if (ip) {
+          visitorIp = ip;
+          storageSet(ANALYTICS_IP_KEY, ip);
+        }
+      } catch (error) {
+        if (config.debug) console.warn("analytics ip lookup failed", error);
+      } finally {
+        clearTimeout(timer);
+      }
     }
 
     function analyticsSessionId() {
@@ -2434,10 +2462,15 @@
     function trackEvent(name, payload = {}, options = {}) {
       const config = analyticsConfig();
       if (!config.enabled || Math.random() > config.sampleRate) return;
+      const now = new Date();
+      const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
       const event = {
         id: analyticsId(),
         name,
-        timestamp: new Date().toISOString(),
+        timestamp: now.toISOString(),
+        localDate: now.toLocaleDateString("zh-CN"),
+        localTime: now.toLocaleTimeString("zh-CN", { hour12: false }),
+        timeZone,
         clientId: analyticsClientId(),
         sessionId: analyticsSessionId(),
         authHash: storageGet(AUTH_STORAGE_KEY),
@@ -2452,7 +2485,8 @@
           platform: navigator.platform || "",
           viewport: `${window.innerWidth}x${window.innerHeight}`,
           screen: `${screen.width}x${screen.height}`,
-          touch: navigator.maxTouchPoints > 0
+          touch: navigator.maxTouchPoints > 0,
+          ip: visitorIp || storageGet(ANALYTICS_IP_KEY)
         },
         payload: sanitizedAnalyticsPayload(payload)
       };
@@ -2939,7 +2973,8 @@
       `).join("");
     }
 
-    function init() {
+    async function init() {
+      await initVisitorIp();
       initAuth();
       initQrModal();
       initBatteryPicker();

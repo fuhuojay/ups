@@ -4,1066 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>艾特网能 UPS 配置工作台</title>
-  <style>
-    :root {
-      --bg: #f7f9fb;
-      --panel: #ffffff;
-      --line: #d9e1e8;
-      --text: #17232b;
-      --muted: #667581;
-      --brand: #1f6f68;
-      --brand-2: #2d7f76;
-      --warn: #b54708;
-      --ok: #087443;
-      --soft: #eaf6f3;
-      --ink: #111f27;
-      --table-header: #f4f7f9;
-      --row-alt: #fbfcfd;
-      --sidebar: #183a36;
-    }
-
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-      color: var(--text);
-      background: var(--bg);
-      line-height: 1.5;
-    }
-
-    header {
-      background: var(--panel);
-      color: var(--ink);
-      padding: 0;
-      border-bottom: 1px solid var(--line);
-    }
-
-    .wrap {
-      max-width: 1480px;
-      margin: 0 auto;
-    }
-
-    h1, h2, h3, p { margin: 0; }
-
-    h1 {
-      font-size: 15px;
-      font-weight: 760;
-      letter-spacing: 0;
-    }
-
-    header p {
-      margin-top: 2px;
-      color: var(--muted);
-      max-width: 880px;
-      font-size: 12px;
-    }
-
-    main {
-      max-width: 1480px;
-      margin: 0 auto;
-      padding: 16px 20px 36px;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
-      gap: 16px;
-      align-items: start;
-    }
-
-    .panel {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 16px;
-      box-shadow: 0 1px 2px rgba(16, 24, 40, 0.035);
-      min-width: 0;
-    }
-
-    .grid > *,
-    .manual > *,
-    .monitor-layout > *,
-    .two > *,
-    .um-accessories > * {
-      min-width: 0;
-    }
-
-    .panel h2 {
-      font-size: 18px;
-      margin-bottom: 14px;
-    }
-
-    .panel-head {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      align-items: center;
-      margin-bottom: 14px;
-    }
-
-    .panel-head h2 {
-      margin-bottom: 0;
-    }
-
-    .panel-head .pill {
-      flex: 0 0 auto;
-    }
-
-    .form-grid {
-      display: grid;
-      gap: 12px;
-    }
-
-    label {
-      display: grid;
-      gap: 6px;
-      color: var(--muted);
-      font-size: 13px;
-      font-weight: 650;
-    }
-
-    select, input {
-      width: 100%;
-      height: 38px;
-      border: 1px solid #c9d2dc;
-      border-radius: 6px;
-      background: #fbfcfd;
-      color: var(--ink);
-      padding: 0 10px;
-      font-size: 13px;
-      outline: none;
-    }
-
-    select:focus, input:focus {
-      border-color: var(--brand-2);
-      box-shadow: 0 0 0 3px rgba(31, 122, 140, 0.16);
-    }
-
-    .two {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .tabs, .seg {
-      display: flex;
-      gap: 6px;
-      padding: 4px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: #f8fafb;
-    }
-
-    .tabs button, .seg button, .primary, .secondary {
-      height: 36px;
-      border: 0;
-      border-radius: 6px;
-      padding: 0 12px;
-      font-weight: 700;
-      cursor: pointer;
-      color: #334155;
-      background: transparent;
-      white-space: nowrap;
-    }
-
-    .tabs button.active, .seg button.active {
-      background: var(--brand);
-      color: #fff;
-    }
-
-    .primary {
-      width: 100%;
-      background: var(--brand);
-      color: #fff;
-      margin-top: 4px;
-      box-shadow: 0 1px 2px rgba(31, 111, 104, 0.2);
-    }
-
-    .secondary {
-      width: 100%;
-      background: #eef5f4;
-      color: var(--brand);
-      margin-top: 0;
-    }
-
-    .summary {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(130px, 1fr));
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-
-    .metric {
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 10px 12px;
-      background: var(--panel);
-      min-height: 78px;
-    }
-
-    .metric span {
-      display: block;
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 650;
-    }
-
-    .metric strong {
-      display: block;
-      margin-top: 8px;
-      color: var(--ink);
-      font-size: 20px;
-      line-height: 1.15;
-      overflow-wrap: anywhere;
-    }
-
-    .metric small {
-      display: block;
-      margin-top: 6px;
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    .note {
-      border-left: 4px solid var(--brand-2);
-      background: #edf7f8;
-      padding: 10px 12px;
-      color: #20515a;
-      border-radius: 4px;
-      margin-bottom: 14px;
-      font-size: 13px;
-    }
-
-    .warn {
-      border-left-color: var(--warn);
-      background: #fff7ed;
-      color: #7c2d12;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-    }
-
-    th, td {
-      text-align: left;
-      border-bottom: 1px solid var(--line);
-      padding: 10px 8px;
-      vertical-align: top;
-    }
-
-    th {
-      color: #475467;
-      font-size: 12px;
-      background: var(--table-header);
-      position: sticky;
-      top: 0;
-      z-index: 1;
-    }
-
-    .table-wrap {
-      overflow: auto;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      max-height: 460px;
-      -webkit-overflow-scrolling: touch;
-      background: var(--panel);
-    }
-
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      height: 24px;
-      padding: 0 8px;
-      border-radius: 999px;
-      background: var(--soft);
-      color: var(--brand);
-      font-size: 12px;
-      font-weight: 750;
-    }
-
-    .muted { color: var(--muted); }
-    .ok { color: var(--ok); font-weight: 800; }
-    .bad { color: var(--warn); font-weight: 800; }
-
-    .manual {
-      margin-top: 18px;
-      display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      gap: 18px;
-    }
-
-    .subsection {
-      margin-top: 18px;
-    }
-
-    .advanced-manual {
-      display: none;
-    }
-
-    .result-block {
-      margin-top: 16px;
-      padding-top: 16px;
-      border-top: 1px solid var(--line);
-    }
-
-    .result-block:first-of-type {
-      margin-top: 0;
-      padding-top: 0;
-      border-top: 0;
-    }
-
-    .result-title {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-
-    .result-title strong {
-      color: var(--ink);
-      font-size: 14px;
-    }
-
-    .calc-process {
-      display: grid;
-      gap: 8px;
-      padding: 12px;
-      border: 1px solid #c7d7e2;
-      border-radius: 8px;
-      background: #f7fbfd;
-      font-size: 13px;
-    }
-
-    .calc-step {
-      display: grid;
-      grid-template-columns: 28px 1fr;
-      gap: 10px;
-      align-items: start;
-    }
-
-    .calc-step b {
-      display: inline-flex;
-      width: 24px;
-      height: 24px;
-      align-items: center;
-      justify-content: center;
-      border-radius: 999px;
-      background: #dceef6;
-      color: #0f5f78;
-      font-size: 12px;
-    }
-
-    .calc-step span {
-      color: #254252;
-      overflow-wrap: anywhere;
-    }
-
-    .monitor-layout {
-      display: grid;
-      grid-template-columns: minmax(300px, 380px) 1fr;
-      gap: 18px;
-      align-items: start;
-    }
-
-    .check-row {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      min-height: 40px;
-      color: var(--ink);
-      font-size: 14px;
-      font-weight: 650;
-    }
-
-    .check-row input {
-      width: 18px;
-      height: 18px;
-      flex: 0 0 auto;
-    }
-
-    input[readonly] {
-      background: #f1f5f9;
-      color: #475467;
-    }
-
-    .guide {
-      display: grid;
-      gap: 10px;
-      margin-bottom: 14px;
-      padding: 12px;
-      border: 1px solid #bfd8d3;
-      border-radius: 8px;
-      background: #f2fbf8;
-      color: #21443e;
-      font-size: 13px;
-    }
-
-    .guide strong {
-      color: #123b34;
-    }
-
-    .guide ol {
-      margin: 0;
-      padding-left: 18px;
-    }
-
-    .guide li + li {
-      margin-top: 4px;
-    }
-
-    .um-config {
-      display: grid;
-      gap: 12px;
-      padding: 12px;
-      border: 1px solid #bfd8d3;
-      border-radius: 8px;
-      background: #f6fbf9;
-    }
-
-    .um-config[hidden],
-    .um-result[hidden],
-    [hidden] {
-      display: none !important;
-    }
-
-    .um-accessories {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-      padding-top: 12px;
-      border-top: 1px solid var(--line);
-    }
-
-    .um-result {
-      margin-bottom: 16px;
-    }
-
-    .price-input {
-      min-width: 96px;
-      height: 32px;
-      padding: 0 8px;
-      text-align: right;
-    }
-
-    .formula {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      background: #101828;
-      color: #d1fadf;
-      border-radius: 8px;
-      padding: 12px;
-      overflow-x: auto;
-      font-size: 13px;
-    }
-
-    .source {
-      margin-top: 12px;
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    .action-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-      margin-top: 14px;
-    }
-
-    .compact-actions {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    .auth-panel {
-      display: grid;
-      grid-template-columns: minmax(280px, 1fr) auto;
-      gap: 16px;
-      align-items: center;
-      margin-bottom: 16px;
-      border-color: var(--line);
-      background: var(--panel);
-      padding: 10px 12px;
-    }
-
-    .auth-copy {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      min-width: 0;
-    }
-
-    .auth-copy strong {
-      color: var(--ink);
-      font-size: 13px;
-      white-space: nowrap;
-    }
-
-    .auth-copy span {
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.4;
-    }
-
-    .auth-controls {
-      display: grid;
-      grid-template-columns: minmax(190px, 1fr) auto auto;
-      gap: 8px;
-      align-items: end;
-      min-width: 430px;
-    }
-
-    .auth-state {
-      font-size: 12px;
-      color: var(--muted);
-      grid-column: 1 / -1;
-    }
-
-    .contact-card {
-      display: grid;
-      grid-template-columns: 48px 1fr;
-      gap: 10px;
-      align-items: center;
-      margin-top: 0;
-      padding: 6px;
-      border: 1px solid #d8e5e3;
-      border-radius: 8px;
-      background: #fbfffd;
-      max-width: 280px;
-      flex: 0 0 auto;
-    }
-
-    .qr-thumb {
-      width: 48px;
-      height: 48px;
-      border: 0;
-      padding: 0;
-      background: transparent;
-      cursor: zoom-in;
-      border-radius: 6px;
-    }
-
-    .qr-thumb:focus-visible {
-      outline: 3px solid rgba(31, 122, 140, 0.22);
-      outline-offset: 2px;
-    }
-
-    .contact-card img {
-      width: 48px;
-      height: 48px;
-      object-fit: cover;
-      border-radius: 6px;
-      border: 1px solid var(--line);
-    }
-
-    .contact-card b {
-      display: block;
-      color: var(--ink);
-      font-size: 13px;
-    }
-
-    .contact-card small {
-      display: block;
-      margin-top: 2px;
-      color: var(--muted);
-      font-size: 11px;
-      line-height: 1.35;
-    }
-
-    .custom-battery {
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 10px;
-      background: #fbfcfd;
-    }
-
-    .custom-battery-fields {
-      display: grid;
-      gap: 10px;
-      margin-top: 10px;
-      padding-top: 10px;
-      border-top: 1px solid var(--line);
-    }
-
-    .custom-battery-summary {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      padding: 8px 10px;
-      border: 1px solid #d8e5e3;
-      border-radius: 6px;
-      background: #fff;
-    }
-
-    .custom-battery-summary strong {
-      color: var(--ink);
-      font-size: 14px;
-      overflow-wrap: anywhere;
-    }
-
-    .custom-battery-summary small {
-      display: block;
-      color: var(--muted);
-      font-size: 11px;
-    }
-
-    .battery-picker-list {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 8px;
-      max-height: min(58vh, 460px);
-      overflow: auto;
-    }
-
-    .battery-picker-item {
-      text-align: left;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 10px;
-      background: #fff;
-      cursor: pointer;
-      color: var(--text);
-    }
-
-    .battery-picker-item:hover,
-    .battery-picker-item:focus-visible {
-      border-color: var(--brand-2);
-      box-shadow: 0 0 0 3px rgba(31, 122, 140, 0.12);
-      outline: none;
-    }
-
-    .battery-picker-item strong,
-    .battery-picker-item small {
-      display: block;
-    }
-
-    .battery-picker-item small {
-      margin-top: 3px;
-      color: var(--muted);
-      font-size: 11px;
-      line-height: 1.35;
-    }
-
-    .qr-modal {
-      position: fixed;
-      inset: 0;
-      z-index: 50;
-      display: grid;
-      place-items: center;
-      padding: 24px;
-      background: rgba(17, 31, 39, 0.68);
-    }
-
-    .qr-modal[hidden] {
-      display: none;
-    }
-
-    .qr-modal-card {
-      width: min(92vw, 520px);
-      background: #fff;
-      border-radius: 8px;
-      padding: 16px;
-      box-shadow: 0 20px 60px rgba(15, 23, 42, 0.28);
-    }
-
-    .qr-modal-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 12px;
-    }
-
-    .qr-modal-head strong {
-      font-size: 16px;
-      color: var(--ink);
-    }
-
-    .qr-modal-close {
-      width: 36px;
-      height: 36px;
-      border: 1px solid var(--line);
-      border-radius: 6px;
-      background: #f8fafb;
-      color: var(--ink);
-      font-size: 24px;
-      line-height: 1;
-      cursor: pointer;
-    }
-
-    .qr-modal img {
-      display: block;
-      width: 100%;
-      max-height: min(72vh, 520px);
-      object-fit: contain;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: #fff;
-    }
-
-    .qr-modal small {
-      display: block;
-      margin-top: 10px;
-      color: var(--muted);
-      text-align: center;
-    }
-
-    .app-bar {
-      min-height: 56px;
-      display: flex;
-      align-items: center;
-      gap: 18px;
-      padding: 10px 20px;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      min-width: 0;
-    }
-
-    .brand-mark {
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
-      display: grid;
-      place-items: center;
-      background: var(--brand);
-      color: #fff;
-      font-weight: 850;
-      letter-spacing: 0;
-      flex: 0 0 auto;
-    }
-
-    .brand-text {
-      min-width: 0;
-    }
-
-    .brand-text h1,
-    .brand-text p {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .app-badges {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      align-items: center;
-      margin-left: 8px;
-    }
-
-    .app-badges .pill {
-      height: 24px;
-      background: #eef2f4;
-      color: #42505a;
-      font-size: 11px;
-      font-weight: 650;
-    }
-
-    .app-badges .pill.ok-pill {
-      background: #e6f5f0;
-      color: var(--brand);
-    }
-
-    .app-audience {
-      margin-left: auto;
-      color: var(--muted);
-      font-size: 12px;
-      white-space: nowrap;
-    }
-
-    .config-panel {
-      position: sticky;
-      top: 16px;
-    }
-
-    .output-panel {
-      padding: 0;
-      overflow: hidden;
-    }
-
-    .workspace-tabs {
-      display: inline-grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 4px;
-      margin: 12px;
-      padding: 4px;
-      border-radius: 8px;
-      background: #eef2f4;
-      color: var(--muted);
-    }
-
-    .workspace-tabs button {
-      height: 34px;
-      border: 0;
-      border-radius: 6px;
-      padding: 0 18px;
-      background: transparent;
-      color: inherit;
-      font-weight: 750;
-      white-space: nowrap;
-      cursor: pointer;
-    }
-
-    .workspace-tabs button.active {
-      background: var(--panel);
-      color: var(--ink);
-      box-shadow: 0 1px 2px rgba(16, 24, 40, 0.08);
-    }
-
-    .output-heading {
-      padding: 0 16px 12px;
-      border-bottom: 1px solid var(--line);
-      margin-bottom: 0;
-    }
-
-    .workspace-view {
-      padding: 16px;
-    }
-
-    .workspace-view[hidden] {
-      display: none !important;
-    }
-
-    .workspace-view.subsection {
-      margin-top: 0;
-      border-top: 1px solid var(--line);
-    }
-
-    .workspace-view.subsection:first-of-type {
-      border-top: 0;
-    }
-
-    .quote-project-view + .quote-project-view {
-      padding-top: 0;
-      border-top: 0;
-    }
-
-    .empty-state {
-      min-height: 100px;
-      display: grid;
-      place-items: center;
-      border: 1px dashed #d7e0e7;
-      border-radius: 8px;
-      color: var(--muted);
-      background: #fbfcfd;
-      text-align: center;
-      padding: 20px;
-    }
-
-    @media (max-width: 980px) {
-      .grid, .manual, .monitor-layout { grid-template-columns: 1fr; }
-      .summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .auth-panel, .auth-controls { grid-template-columns: 1fr; min-width: 0; }
-      .config-panel { position: static; }
-      .app-audience { display: none; }
-    }
-
-    @media (max-width: 760px) {
-      header {
-        padding: 0;
-      }
-
-      h1 {
-        font-size: 14px;
-        line-height: 1.2;
-      }
-
-      header p {
-        font-size: 12px;
-        line-height: 1.55;
-      }
-
-      main {
-        padding: 12px 10px 28px;
-      }
-
-      .app-bar {
-        padding: 10px 12px;
-        align-items: flex-start;
-        flex-direction: column;
-        gap: 8px;
-      }
-
-      .app-badges {
-        margin-left: 42px;
-      }
-
-      .auth-copy {
-        display: grid;
-        gap: 8px;
-      }
-
-      .contact-card {
-        max-width: none;
-      }
-
-      .custom-battery-summary {
-        align-items: stretch;
-        flex-direction: column;
-      }
-
-      .battery-picker-list {
-        grid-template-columns: 1fr;
-      }
-
-      .workspace-tabs {
-        display: grid;
-        width: calc(100% - 24px);
-        overflow-x: auto;
-      }
-
-      .workspace-tabs button {
-        padding: 0 8px;
-        font-size: 12px;
-      }
-
-      .grid,
-      .manual,
-      .monitor-layout {
-        gap: 12px;
-      }
-
-      .panel {
-        padding: 12px;
-        border-radius: 7px;
-      }
-
-      .output-panel {
-        padding: 0;
-      }
-
-      .panel h2 {
-        font-size: 16px;
-      }
-
-      .panel-head {
-        align-items: flex-start;
-        flex-direction: column;
-        gap: 8px;
-      }
-
-      .panel-head .pill {
-        align-self: flex-start;
-      }
-
-      select,
-      input {
-        height: 44px;
-        font-size: 16px;
-      }
-
-      .primary,
-      .secondary,
-      .tabs button,
-      .seg button {
-        height: 42px;
-        min-height: 42px;
-      }
-
-      .tabs button,
-      .seg button {
-        flex: 1 0 auto;
-      }
-
-      .summary {
-        gap: 8px;
-        margin-bottom: 12px;
-      }
-
-      .metric {
-        min-height: 76px;
-        padding: 10px;
-      }
-
-      .metric strong {
-        font-size: 17px;
-      }
-
-      .result-block {
-        margin-top: 12px;
-        padding-top: 12px;
-      }
-
-      .calc-process,
-      .guide,
-      .note {
-        font-size: 12px;
-      }
-
-      .table-wrap {
-        max-height: none;
-      }
-
-      table {
-        font-size: 12px;
-      }
-
-      th,
-      td {
-        padding: 8px 7px;
-      }
-
-      th {
-        top: 0;
-      }
-
-      .source {
-        font-size: 11px;
-      }
-    }
-
-    @media (max-width: 560px) {
-      main { padding-left: 12px; padding-right: 12px; }
-      .summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .two, .um-accessories { grid-template-columns: 1fr; }
-      .tabs, .seg { overflow-x: auto; }
-      th, td { min-width: 112px; }
-      .compact-actions { grid-template-columns: 1fr; }
-      .contact-card {
-        grid-template-columns: 56px 1fr;
-        align-items: center;
-      }
-      .qr-thumb,
-      .contact-card img {
-        width: 56px;
-        height: 56px;
-      }
-      .auth-controls {
-        gap: 10px;
-      }
-      .check-row {
-        min-height: 36px;
-      }
-    }
-
-    @media (max-width: 390px) {
-      main {
-        padding-left: 8px;
-        padding-right: 8px;
-      }
-
-      .summary {
-        grid-template-columns: 1fr;
-      }
-
-      .contact-card {
-        grid-template-columns: 1fr;
-      }
-
-      .app-badges {
-        margin-left: 0;
-      }
-    }
-  </style>
+  <meta name="theme-color" content="#f5f5f7">
+  <meta name="description" content="艾特网能 UPS 配置工作台：蓄电池选型、后备时间核算、电池监控仪配置与 Excel 报价导出。">
+  <link rel="stylesheet" href="assets/workspace.css">
 </head>
 <body>
   <header>
@@ -1084,17 +27,22 @@
   </header>
 
   <main>
-    <section class="panel auth-panel">
+    <details class="auth-disclosure">
+      <summary>
+        <strong>报价权限</strong>
+        <span class="auth-state" id="authState" aria-live="polite">未验证 · 报价金额已隐藏</span>
+        <span class="disclosure-action">验证 / 联系</span>
+      </summary>
+    <section class="auth-panel" aria-label="报价权限验证">
       <div class="auth-copy">
-        <strong>权限验证</strong>
-        <span>未授权访问时，页面和导出的报价会隐藏目录价、折后价和合计金额。如需使用完整功能，请联系开发者 Michael，对项目有建议请加微信，感谢您的反馈。</span>
+        <span>验证手机号后，可查看并导出完整报价。申请权限或反馈建议，请联系 Michael。</span>
         <div class="contact-card">
           <button class="qr-thumb" id="openQrModal" type="button" aria-label="放大 Michael 微信二维码">
             <img src="assets/michael-wechat.jpg" alt="Michael 微信二维码">
           </button>
           <div>
             <b>联系开发者 Michael</b>
-            <small>点击二维码放大，扫码添加微信，申请完整功能权限，或反馈项目建议。</small>
+            <small>扫码申请权限或反馈建议</small>
           </div>
         </div>
       </div>
@@ -1105,9 +53,9 @@
         </label>
         <button class="secondary" id="authVerify" type="button">验证</button>
         <button class="secondary" id="authLogout" type="button">退出</button>
-        <span class="auth-state" id="authState">未验证：目录价将显示为 ****</span>
       </div>
     </section>
+    </details>
 
     <div class="qr-modal" id="qrModal" hidden aria-hidden="true">
       <div class="qr-modal-card" role="dialog" aria-modal="true" aria-labelledby="qrModalTitle">
@@ -1142,8 +90,11 @@
 
     <div class="grid">
       <section class="panel config-panel">
-        <h2>配置选择</h2>
+        <h2>配置参数</h2>
         <div class="form-grid">
+          <fieldset class="form-section">
+            <legend>01 · UPS 设备</legend>
+            <div class="form-grid">
           <label>
             UPS 系列
             <select id="series"></select>
@@ -1228,6 +179,11 @@
             </div>
           </div>
 
+            </div>
+          </fieldset>
+          <fieldset class="form-section">
+            <legend>02 · 电池与后备时间</legend>
+            <div class="form-grid">
           <div class="two">
             <label>
               电池系列
@@ -1286,9 +242,14 @@
             </div>
           </div>
 
+            </div>
+          </fieldset>
+          <fieldset class="form-section">
+            <legend>03 · 运行与部署</legend>
+            <div class="form-grid">
           <div class="two">
             <label>
-              负载率
+              负载率（%）
               <input id="loadRate" type="number" min="1" max="100" step="1" value="100">
             </label>
             <label>
@@ -1313,13 +274,20 @@
             </label>
           </div>
 
-          <button class="primary" id="apply">计算</button>
+            </div>
+          </fieldset>
+          <div class="config-actions">
+          <button class="primary" id="apply">计算配置</button>
           <div class="compact-actions">
             <button class="secondary" id="addProjectItem" type="button">加入项目清单</button>
             <button class="secondary" id="exportQuote" type="button">导出 Excel 报价</button>
           </div>
+          </div>
         </div>
+        <details class="source-details">
+          <summary>资料来源与计算依据</summary>
         <p class="source">资料来源：Drive 文件夹 “03】-UPS&供配电 / 销售配置指导 / 电池销售配置指导书”；UM 电池配置来自 “UPS蓄电池配置表（20181026）”，电池重量、容量和端子按 “07】-铅酸电池” SP-b / SPG-b / GFMD-B / GBT 彩页校准；价格按本地“价格”目录中的 UPS、电池、监控仪价格表带入。</p>
+        </details>
       </section>
 
       <section class="panel output-panel">
@@ -1337,8 +305,8 @@
           <div class="result-title">
             <strong>配置摘要</strong>
           </div>
-          <div class="summary">
-          <div class="metric">
+          <div class="summary config-summary">
+          <div class="metric metric-featured">
             <span id="recBatteryLabel">推荐电池</span>
             <strong id="recBattery">-</strong>
             <small id="recDuration">-</small>
@@ -2672,7 +1640,7 @@
       isPriceAuthorized = authorized;
       document.querySelector("#authState").textContent = message || (authorized
         ? "已授权：目录价、折扣和合计金额可见。"
-        : "未验证：目录价将显示为 ****。如需使用完整功能，请联系开发者 Michael，对项目有建议请加微信，感谢您的反馈。");
+        : "未验证 · 报价金额已隐藏，可展开验证或联系 Michael。");
       document.querySelector("#authPhone").value = authorized ? "已授权" : "";
       document.querySelector("#authPhone").disabled = authorized;
       document.querySelector("#authVerify").disabled = authorized;
